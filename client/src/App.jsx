@@ -1,64 +1,57 @@
-import { MapPin, Search, Sparkles } from "lucide-react"
+import { Navigate, Route, Routes } from "react-router-dom"
 
-import { Button } from "./components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./components/ui/card"
-import { Input } from "./components/ui/input"
+import Navbar from "./components/layout/Navbar"
+
+import Home from "./pages/Home"
+import Rooms from "./pages/Rooms"
+import Destinations from "./pages/Destinations"
+import AIPlanner from "./pages/AIPlanner"
+import MyBookings from "./pages/MyBookings"
+import SignIn from "./pages/SignIn"
+import SignUp from "./pages/SignUp"
 
 function App() {
   return (
-    <main className="min-h-screen p-8">
-      <div className="mx-auto max-w-4xl space-y-8">
-        <section className="space-y-3">
-          <p className="text-sm font-medium uppercase tracking-widest">
-            VAZHO
-          </p>
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
 
-          <h1 className="text-4xl font-bold tracking-tight">
-            Your journey starts here.
-          </h1>
+      <Routes>
+        <Route path="/" element={<Home />} />
 
-          <p className="max-w-2xl text-muted-foreground">
-            AI-powered travel, accommodation and personalized trip planning.
-          </p>
-        </section>
+        <Route path="/rooms" element={<Rooms />} />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Explore your next destination</CardTitle>
+        <Route
+          path="/destinations"
+          element={<Destinations />}
+        />
 
-            <CardDescription>
-              Search for destinations and places to stay.
-            </CardDescription>
-          </CardHeader>
+        <Route
+          path="/ai-planner"
+          element={<AIPlanner />}
+        />
 
-          <CardContent>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <div className="flex flex-1 items-center gap-2">
-                <MapPin className="size-5" />
+        <Route
+          path="/bookings"
+          element={<MyBookings />}
+        />
 
-                <Input placeholder="Where are you going?" />
-              </div>
+        <Route
+          path="/sign-in"
+          element={<SignIn />}
+        />
 
-              <Button>
-                <Search />
-                Search
-              </Button>
+        <Route
+          path="/sign-up"
+          element={<SignUp />}
+        />
 
-              <Button variant="outline">
-                <Sparkles />
-                AI Planner
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </main>
+        {/* Unknown routes */}
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+      </Routes>
+    </div>
   )
 }
 

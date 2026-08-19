@@ -10,6 +10,11 @@ import AIPlanner from "./pages/AIPlanner"
 import MyBookings from "./pages/MyBookings"
 import SignIn from "./pages/SignIn"
 import SignUp from "./pages/SignUp"
+import Footer from "./components/layout/Footer"
+import About from "./pages/About"
+import Contact from "./pages/Contact"
+import Privacy from "./pages/Privacy"
+import Terms from "./pages/Terms"
 
 function App() {
   return (
@@ -40,6 +45,25 @@ function App() {
           path="/bookings"
           element={<MyBookings />}
         />
+        <Route
+          path="/about"
+          element={<About />}
+        />
+
+        <Route
+          path="/contact"
+          element={<Contact />}
+        />
+
+        <Route
+          path="/privacy"
+          element={<Privacy />}
+        />
+
+        <Route
+          path="/terms"
+          element={<Terms />}
+        />
 
         <Route
           path="/sign-in"
@@ -57,6 +81,7 @@ function App() {
           element={<Navigate to="/" replace />}
         />
       </Routes>
+      <Footer />
     </div>
   )
 }

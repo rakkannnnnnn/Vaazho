@@ -12,7 +12,7 @@ function Hero() {
         className="absolute inset-0 -z-20 bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=2000&q=85')",
+            "url('https://images.unsplash.com/photo-1422493757035-1e5e03968f95?auto=format&fit=crop&w=2400&q=90')",
         }}
       />
 

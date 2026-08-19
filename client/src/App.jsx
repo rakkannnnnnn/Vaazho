@@ -4,6 +4,7 @@ import Navbar from "./components/layout/Navbar"
 
 import Home from "./pages/Home"
 import Rooms from "./pages/Rooms"
+import DestinationDetail from "./pages/DestinationDetail"
 import Destinations from "./pages/Destinations"
 import AIPlanner from "./pages/AIPlanner"
 import MyBookings from "./pages/MyBookings"
@@ -23,6 +24,11 @@ function App() {
         <Route
           path="/destinations"
           element={<Destinations />}
+        />
+
+        <Route
+          path="/destinations/:slug"
+          element={<DestinationDetail />}
         />
 
         <Route

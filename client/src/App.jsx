@@ -15,6 +15,8 @@ import About from "./pages/About"
 import Contact from "./pages/Contact"
 import Privacy from "./pages/Privacy"
 import Terms from "./pages/Terms"
+import Dashboard from "./pages/Dashboard"
+
 
 function App() {
   return (
@@ -66,12 +68,17 @@ function App() {
         />
 
         <Route
-          path="/sign-in"
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/sign-in/*"
           element={<SignIn />}
         />
 
         <Route
-          path="/sign-up"
+          path="/sign-up/*"
           element={<SignUp />}
         />
 

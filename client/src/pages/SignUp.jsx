@@ -1,17 +1,15 @@
-function SignUp() {
-  return (
-    <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl items-center justify-center px-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">
-          Create your VAZHO account
-        </h1>
+import { SignUp } from "@clerk/react"
 
-        <p className="mt-3 text-muted-foreground">
-          Authentication will be implemented on Day 8.
-        </p>
-      </div>
+function SignUpPage() {
+  return (
+    <main className="flex min-h-[calc(100vh-5rem)] items-center justify-center px-4 py-12">
+      <SignUp
+        routing="path"
+        path="/sign-up"
+        signInUrl="/sign-in"
+      />
     </main>
   )
 }
 
-export default SignUp
+export default SignUpPage

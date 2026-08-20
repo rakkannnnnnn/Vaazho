@@ -7,6 +7,13 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 
+import {
+  Show,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/react"
+
 import Logo from "../branding/Logo"
 import ThemeToggle from "./ThemeToggle"
 import { Button } from "../ui/button"
@@ -72,6 +79,15 @@ function Navbar() {
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
 
+          {/* Signed In Dashboard */}
+          <Show when="signed-in">
+            <Link to="/dashboard">
+              <Button variant="ghost" size="sm">
+                Dashboard
+              </Button>
+            </Link>
+          </Show>
+
           <Link to="/bookings">
             <Button variant="ghost" size="sm">
               <CalendarCheck />
@@ -79,17 +95,33 @@ function Navbar() {
             </Button>
           </Link>
 
-          <Link to="/sign-in">
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-          </Link>
+          {/* Signed Out */}
+          <Show when="signed-out">
+            <div className="flex items-center gap-2">
+              <SignInButton mode="modal">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </SignInButton>
 
-          <Link to="/sign-up">
-            <Button size="sm">
-              Sign Up
-            </Button>
-          </Link>
+              <SignUpButton mode="modal">
+                <Button size="sm">
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </div>
+          </Show>
+
+          {/* Signed In */}
+          <Show when="signed-in">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "size-9",
+                },
+              }}
+            />
+          </Show>
         </div>
 
         {/* Mobile Menu Button */}
@@ -134,6 +166,24 @@ function Navbar() {
               )
             })}
 
+            {/* Mobile Dashboard */}
+            <Show when="signed-in">
+              <NavLink
+                to="/dashboard"
+                onClick={closeMobileMenu}
+                className={({ isActive }) =>
+                  `flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  }`
+                }
+              >
+                Dashboard
+              </NavLink>
+            </Show>
+
+            {/* Mobile My Bookings */}
             <NavLink
               to="/bookings"
               onClick={closeMobileMenu}
@@ -149,28 +199,40 @@ function Navbar() {
               My Bookings
             </NavLink>
 
+            {/* Mobile Actions */}
             <div className="mt-3 flex items-center gap-2 border-t border-border pt-4">
               <ThemeToggle />
 
-              <Link
-                to="/sign-in"
-                onClick={closeMobileMenu}
-                className="flex-1"
-              >
-                <Button variant="outline" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
+              {/* Signed Out */}
+              <Show when="signed-out">
+                <SignInButton mode="modal">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Sign In
+                  </Button>
+                </SignInButton>
 
-              <Link
-                to="/sign-up"
-                onClick={closeMobileMenu}
-                className="flex-1"
-              >
-                <Button className="w-full">
-                  Sign Up
-                </Button>
-              </Link>
+                <SignUpButton mode="modal">
+                  <Button className="flex-1">
+                    Sign Up
+                  </Button>
+                </SignUpButton>
+              </Show>
+
+              {/* Signed In */}
+              <Show when="signed-in">
+                <div className="flex flex-1 justify-end">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "size-9",
+                      },
+                    }}
+                  />
+                </div>
+              </Show>
             </div>
           </nav>
         </div>

@@ -1,51 +1,43 @@
 # VAZHO
 
-AI-Powered Travel, Accommodation & Personalized Trip Planning Platform.
+AI-Powered Travel, Accommodation & Personalized Trip Planning Platform
 
 ## Project Type
 
-College Major Project / Internship Project
+College Major Project
 
-## Technology Stack
+## Architecture
 
-### Frontend
-- React
-- Vite
+MERN Stack + AI
 
-### Backend
-- Node.js
-- Express.js
+## Frontend
 
-### Database
-- MongoDB
-- Mongoose
+React + Vite
 
-### Authentication
-- Clerk
+## Backend
 
-### AI
-- Google Gemini API
+Node.js + Express.js
 
-### UI
-- Tailwind CSS
-- shadcn/ui
-- Lucide Icons
+## Database
 
-### Maps
-- Leaflet
-- React Leaflet
+MongoDB + Mongoose
 
-### Payments
-- Razorpay Test Mode
+## AI
 
-### Email
-- Nodemailer
+Google Gemini API
 
-## Project Structure
+## Authentication
 
-```text
-VAZHO/
-├── client/
-├── server/
-├── .gitignore
-└── README.md
+Clerk
+
+## Payments
+
+Razorpay Test Mode
+
+## Maps
+
+Leaflet + React Leaflet
+
+## Email
+
+Nodemailer

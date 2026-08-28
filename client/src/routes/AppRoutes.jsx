@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import MainLayout from "@/layouts/MainLayout";
 
@@ -8,6 +8,28 @@ import Destinations from "@/pages/Destinations/Destinations";
 import AIPlanner from "@/pages/AIPlanner/AIPlanner";
 import MyBookings from "@/pages/MyBookings/MyBookings";
 import DestinationDetail from "@/pages/Destinations/DestinationDetail";
+import About from "@/pages/About/About";
+import Contact from "@/pages/Contact/Contact";
+import Terms from "@/pages/Terms/Terms";
+import Privacy from "@/pages/Privacy/Privacy";
+import SignInPage from "@/pages/SignIn/SignIn";
+import SignUpPage from "@/pages/SignUp/SignUp";
+import Account from "@/pages/Account/Account";
+import { useAuth } from "@clerk/react";
+
+function ProtectedAccount() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) {
+    return null;
+  }
+
+  if (!isSignedIn) {
+    return <Navigate to="/sign-in" replace state={{ from: "/account" }} />;
+  }
+
+  return <Account />;
+}
 
 function AppRoutes() {
   return (
@@ -32,6 +54,13 @@ function AppRoutes() {
             path="/bookings"
             element={<MyBookings />}
           />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/sign-in/*" element={<SignInPage />} />
+          <Route path="/sign-up/*" element={<SignUpPage />} />
+          <Route path="/account" element={<ProtectedAccount />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -15,4 +15,12 @@ export const navLinks = [
     label: "AI Planner",
     path: "/ai-planner",
   },
+  {
+    label: "About",
+    path: "/about",
+  },
+  {
+    label: "Contact",
+    path: "/contact",
+  },
 ];

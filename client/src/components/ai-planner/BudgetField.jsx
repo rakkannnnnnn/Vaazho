@@ -6,13 +6,13 @@ function BudgetField({ value, onChange }) {
     <div>
       <label
         htmlFor="budget"
-        className="mb-2 block text-sm font-semibold"
+        className="mb-2 block text-sm font-semibold text-neutral-900 dark:!text-white"
       >
         Trip budget
       </label>
 
       <div className="relative">
-        <IndianRupee className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+        <IndianRupee className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
 
         <Input
           id="budget"
@@ -21,11 +21,11 @@ function BudgetField({ value, onChange }) {
           placeholder="25,000"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="pl-9"
+          className="pl-9 text-neutral-900 placeholder:text-neutral-500 dark:!text-white dark:placeholder:text-neutral-400"
         />
       </div>
 
-      <p className="mt-1.5 text-xs text-neutral-500">
+      <p className="mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">
         Enter your approximate total trip budget.
       </p>
     </div>

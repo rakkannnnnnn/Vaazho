@@ -13,11 +13,11 @@ function InterestsField({ value, onChange }) {
   return (
     <div>
       <div className="mb-3">
-        <p className="text-sm font-semibold">
+        <p className="text-sm font-semibold text-neutral-900 dark:text-white">
           What are you interested in?
         </p>
 
-        <p className="mt-1 text-xs text-neutral-500">
+        <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
           Select as many as you like.
         </p>
       </div>
@@ -34,8 +34,8 @@ function InterestsField({ value, onChange }) {
               aria-pressed={selected}
               className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                 selected
-                  ? "border-neutral-950 bg-neutral-950 text-white"
-                  : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400"
+                  ? "border-neutral-950 bg-neutral-950 text-white dark:border-neutral-300 dark:bg-neutral-700 dark:text-white"
+                  : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400 dark:border-neutral-700 dark:!bg-neutral-800 dark:!text-neutral-200 dark:hover:border-neutral-500"
               }`}
             >
               {interest}

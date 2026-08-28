@@ -4,7 +4,7 @@ function FoodPreferenceField({ value, onChange }) {
   return (
     <div>
       <div className="mb-3">
-        <p className="text-sm font-semibold">
+        <p className="text-sm font-semibold text-neutral-900 dark:text-white">
           Food preference
         </p>
       </div>
@@ -21,8 +21,8 @@ function FoodPreferenceField({ value, onChange }) {
               aria-pressed={selected}
               className={`rounded-xl border px-3 py-3 text-sm font-medium transition ${
                 selected
-                  ? "border-neutral-950 bg-neutral-950 text-white"
-                  : "border-neutral-200 bg-white hover:border-neutral-400"
+                  ? "border-neutral-950 bg-neutral-950 text-white dark:border-neutral-300 dark:bg-neutral-700 dark:text-white"
+                  : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400 dark:border-neutral-700 dark:!bg-neutral-800 dark:!text-neutral-200 dark:hover:border-neutral-500"
               }`}
             >
               {option}

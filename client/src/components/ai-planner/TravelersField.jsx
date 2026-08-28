@@ -6,13 +6,13 @@ function TravelersField({ value, onChange }) {
     <div>
       <label
         htmlFor="travelers"
-        className="mb-2 block text-sm font-semibold"
+        className="mb-2 block text-sm font-semibold text-neutral-900 dark:!text-white"
       >
         Travelers
       </label>
 
       <div className="relative">
-        <Users className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+        <Users className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
 
         <Input
           id="travelers"
@@ -22,11 +22,11 @@ function TravelersField({ value, onChange }) {
           placeholder="2"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="pl-9"
+          className="pl-9 text-neutral-900 placeholder:text-neutral-500 dark:!text-white dark:placeholder:text-neutral-400"
         />
       </div>
 
-      <p className="mt-1.5 text-xs text-neutral-500">
+      <p className="mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">
         How many people are traveling?
       </p>
     </div>

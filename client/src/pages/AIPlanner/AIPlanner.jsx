@@ -1,14 +1,17 @@
+import PlannerForm from "@/components/ai-planner/PlannerForm";
+import PlannerHeader from "@/components/ai-planner/PlannerHeader";
+
 function AIPlanner() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16">
-      <h1 className="text-4xl font-bold tracking-tight">
-        AI Planner
-      </h1>
+    <main className="min-h-screen bg-neutral-50">
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+        <PlannerHeader />
 
-      <p className="mt-3 text-neutral-600 dark:text-neutral-400">
-        Plan your journey with VAZHO AI.
-      </p>
-    </section>
+        <div className="mx-auto mt-12 max-w-3xl rounded-3xl border bg-white p-6 shadow-sm sm:p-8 lg:p-10">
+          <PlannerForm />
+        </div>
+      </section>
+    </main>
   );
 }
 

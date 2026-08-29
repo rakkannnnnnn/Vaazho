@@ -12,12 +12,23 @@ const propertySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     description: {
       type: String,
+      required: true,
     },
     location: {
       type: String,
       required: true,
+    },
+    address: {
+      type: String,
+      trim: true,
     },
     images: [
       {
@@ -35,10 +46,13 @@ const propertySchema = new mongoose.Schema(
       max: 5,
       default: 0,
     },
+    featured: {
+      type: Boolean,
+      default: false,
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
   },
   {

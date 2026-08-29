@@ -20,4 +20,8 @@ async function fetchJson(url, options = {}) {
 export const api = {
   getDestinations: () => fetchJson("/api/destinations"),
   getDestinationBySlug: (slug) => fetchJson(`/api/destinations/${slug}`),
+  getProperties: () => fetchJson("/api/properties"),
+  getPropertiesByDestination: (destinationSlug) =>
+    fetchJson(`/api/properties/destination/${destinationSlug}`),
+  getPropertyBySlug: (slug) => fetchJson(`/api/properties/${slug}`),
 };

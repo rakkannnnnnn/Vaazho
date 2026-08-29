@@ -94,6 +94,13 @@ function DestinationDetail() {
               <p className="mt-4 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
                 {destination.description}
               </p>
+
+              <Link
+                to={`/properties?destination=${destination.slug}`}
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-100"
+              >
+                Explore stays
+              </Link>
             </div>
           </div>
         </div>

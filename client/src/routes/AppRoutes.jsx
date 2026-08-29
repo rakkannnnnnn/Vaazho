@@ -15,6 +15,8 @@ import Privacy from "@/pages/Privacy/Privacy";
 import SignInPage from "@/pages/SignIn/SignIn";
 import SignUpPage from "@/pages/SignUp/SignUp";
 import Account from "@/pages/Account/Account";
+import Properties from "@/pages/Properties/Properties";
+import PropertyDetails from "@/pages/PropertyDetails/PropertyDetails";
 import { useAuth } from "@clerk/react";
 
 function ProtectedAccount() {
@@ -45,6 +47,14 @@ function AppRoutes() {
           <Route
             path="/destinations/:slug"
             element={<DestinationDetail />}
+          />
+          <Route
+            path="/properties"
+            element={<Properties />}
+          />
+          <Route
+            path="/properties/:slug"
+            element={<PropertyDetails />}
           />
           <Route
             path="/ai-planner"

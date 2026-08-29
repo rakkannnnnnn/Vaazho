@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 
 const destinationRoutes = require("./routes/destinationRoutes");
+const propertyRoutes = require("./routes/propertyRoutes");
 
 const app = express();
 
@@ -16,5 +17,6 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/destinations", destinationRoutes);
+app.use("/api/properties", propertyRoutes);
 
 module.exports = app;

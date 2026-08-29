@@ -8,6 +8,7 @@ import Destinations from "@/pages/Destinations/Destinations";
 import AIPlanner from "@/pages/AIPlanner/AIPlanner";
 import MyBookings from "@/pages/MyBookings/MyBookings";
 import DestinationDetail from "@/pages/Destinations/DestinationDetail";
+import SearchResults from "@/pages/Search/SearchResults";
 import About from "@/pages/About/About";
 import Contact from "@/pages/Contact/Contact";
 import Terms from "@/pages/Terms/Terms";
@@ -40,6 +41,7 @@ function AppRoutes() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/rooms/:slug" element={<RoomDetails />} />
           <Route

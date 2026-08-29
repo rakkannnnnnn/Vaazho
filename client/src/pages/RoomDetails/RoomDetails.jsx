@@ -1,7 +1,8 @@
-import { ArrowLeft, BedDouble, MapPin, Users } from "lucide-react";
+import { ArrowLeft, BedDouble, MapPin, Maximize2, Shield, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import BookingCard from "@/components/booking/BookingCard";
 import { api } from "@/lib/api";
 
 function RoomDetails() {
@@ -68,6 +69,7 @@ function RoomDetails() {
 
   return (
     <main>
+      {/* Hero Header */}
       <section className="relative h-[55vh] min-h-[400px] overflow-hidden">
         <img
           src={room.images?.[0] || property.images?.[0]}
@@ -95,32 +97,64 @@ function RoomDetails() {
         </div>
       </section>
 
+      {/* Main Content & Booking Section */}
       <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_0.6fr]">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-              Room overview
-            </p>
+        <div className="grid gap-10 lg:grid-cols-[1.3fr_0.9fr] items-start">
+          {/* Left Column: Room Details & Amenities */}
+          <div className="space-y-10">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
+                Room overview
+              </p>
 
-            <h2 className="mt-3 text-3xl font-bold text-neutral-900 dark:text-white">
-              Stay in {property.name}
-            </h2>
+              <h2 className="mt-3 text-3xl font-bold text-neutral-900 dark:text-white">
+                Stay in {property.name}
+              </h2>
 
-            <p className="mt-4 text-lg leading-8 text-neutral-600 dark:text-neutral-300">
-              {room.description}
-            </p>
+              <p className="mt-4 text-lg leading-8 text-neutral-600 dark:text-neutral-300">
+                {room.description}
+              </p>
+            </div>
 
+            {/* Room Features Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900/60">
+                <BedDouble className="mx-auto h-5 w-5 text-neutral-600 dark:text-neutral-300" />
+                <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Bed Type</p>
+                <p className="mt-0.5 text-sm font-semibold text-neutral-900 dark:text-white">{room.bedType}</p>
+              </div>
+
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900/60">
+                <Users className="mx-auto h-5 w-5 text-neutral-600 dark:text-neutral-300" />
+                <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Max Capacity</p>
+                <p className="mt-0.5 text-sm font-semibold text-neutral-900 dark:text-white">{room.capacity} Guests</p>
+              </div>
+
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900/60">
+                <Maximize2 className="mx-auto h-5 w-5 text-neutral-600 dark:text-neutral-300" />
+                <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Room Size</p>
+                <p className="mt-0.5 text-sm font-semibold text-neutral-900 dark:text-white">{room.roomSize} sq ft</p>
+              </div>
+
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900/60">
+                <Shield className="mx-auto h-5 w-5 text-neutral-600 dark:text-neutral-300" />
+                <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Available</p>
+                <p className="mt-0.5 text-sm font-semibold text-neutral-900 dark:text-white">{room.availableRooms} / {room.totalRooms}</p>
+              </div>
+            </div>
+
+            {/* Amenities */}
             {room.amenities?.length > 0 && (
-              <div className="mt-8">
+              <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-                  Amenities
+                  Amenities Included
                 </p>
 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-2.5">
                   {room.amenities.map((amenity) => (
                     <span
                       key={amenity}
-                      className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+                      className="rounded-xl border border-neutral-200 bg-neutral-50 px-3.5 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
                     >
                       {amenity}
                     </span>
@@ -128,40 +162,22 @@ function RoomDetails() {
                 </div>
               </div>
             )}
+
+            {/* Back link */}
+            <div>
+              <Link
+                to={property.slug ? `/properties/${property.slug}` : "/properties"}
+                className="inline-flex items-center gap-2 font-semibold text-neutral-900 dark:text-white hover:underline"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to {property.name || "stay"}
+              </Link>
+            </div>
           </div>
 
-          <aside className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-              Room details
-            </p>
-
-            <div className="mt-4 space-y-3 text-neutral-700 dark:text-neutral-200">
-              <p className="flex items-center gap-2">
-                <BedDouble className="h-4 w-4" />
-                <span className="font-semibold">Bed:</span> {room.bedType}
-              </p>
-              <p className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span className="font-semibold">Capacity:</span> {room.capacity} guests
-              </p>
-              <p>
-                <span className="font-semibold">Room size:</span> {room.roomSize} sq ft
-              </p>
-              <p>
-                <span className="font-semibold">Available rooms:</span> {room.availableRooms} / {room.totalRooms}
-              </p>
-              <p>
-                <span className="font-semibold">Price:</span> ₹{room.pricePerNight}/night
-              </p>
-            </div>
-
-            <Link
-              to={property.slug ? `/properties/${property.slug}` : "/properties"}
-              className="mt-6 inline-flex items-center gap-2 font-semibold text-neutral-900 dark:text-white"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to stay
-            </Link>
+          {/* Right Column: Interactive Booking Card with Customizations */}
+          <aside className="sticky top-24">
+            <BookingCard room={room} />
           </aside>
         </div>
       </section>

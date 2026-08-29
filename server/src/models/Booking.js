@@ -1,11 +1,42 @@
 const mongoose = require("mongoose");
 
+const bookingCustomizationSchema = new mongoose.Schema(
+  {
+    customization: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customization",
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    pricingType: {
+      type: String,
+      required: true,
+      enum: ["per-booking", "per-night", "per-person"],
+    },
+    calculatedAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+  },
+  { _id: false }
+);
+
 const bookingSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
 
     property: {
@@ -48,6 +79,23 @@ const bookingSchema = new mongoose.Schema(
       min: 0,
     },
 
+    roomTotal: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    customizations: {
+      type: [bookingCustomizationSchema],
+      default: [],
+    },
+
+    customizationTotal: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
     totalAmount: {
       type: Number,
       required: true,
@@ -57,7 +105,7 @@ const bookingSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "confirmed", "cancelled", "completed"],
-      default: "pending",
+      default: "confirmed",
     },
 
     paymentStatus: {

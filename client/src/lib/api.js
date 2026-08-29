@@ -9,12 +9,17 @@ async function fetchJson(url, options = {}) {
     ...options,
   });
 
+  const data = await response.json().catch(() => null);
+
   if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage || "Request failed");
+    const errorMessage = data?.message || (typeof data === "string" ? data : "Request failed");
+    const error = new Error(errorMessage);
+    error.status = response.status;
+    error.data = data;
+    throw error;
   }
 
-  return response.json();
+  return data;
 }
 
 export const api = {
@@ -30,4 +35,12 @@ export const api = {
   getRoomsByProperty: (propertySlug) =>
     fetchJson(`/api/rooms/property/${propertySlug}`),
   getRoomBySlug: (slug) => fetchJson(`/api/rooms/${slug}`),
+  getCustomizations: () => fetchJson("/api/customizations"),
+  checkAvailability: (params) =>
+    fetchJson(`/api/bookings/availability?${new URLSearchParams(params).toString()}`),
+  createBooking: (bookingData) =>
+    fetchJson("/api/bookings", {
+      method: "POST",
+      body: JSON.stringify(bookingData),
+    }),
 };

@@ -24,4 +24,8 @@ export const api = {
   getPropertiesByDestination: (destinationSlug) =>
     fetchJson(`/api/properties/destination/${destinationSlug}`),
   getPropertyBySlug: (slug) => fetchJson(`/api/properties/${slug}`),
+  getRooms: () => fetchJson("/api/rooms"),
+  getRoomsByProperty: (propertySlug) =>
+    fetchJson(`/api/rooms/property/${propertySlug}`),
+  getRoomBySlug: (slug) => fetchJson(`/api/rooms/${slug}`),
 };

@@ -1,39 +1,33 @@
-import { ArrowLeft, MapPin, Star } from "lucide-react";
+import { ArrowLeft, BedDouble, MapPin, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import RoomGrid from "@/components/rooms/RoomGrid";
 import { api } from "@/lib/api";
 
-function PropertyDetails() {
+function RoomDetails() {
   const { slug } = useParams();
-  const [property, setProperty] = useState(null);
-  const [rooms, setRooms] = useState([]);
+  const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadProperty = async () => {
+    const loadRoom = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const response = await api.getPropertyBySlug(slug);
-        setProperty(response.data || null);
-
-        const roomsResponse = await api.getRoomsByProperty(slug);
-        setRooms(roomsResponse.data || []);
+        const response = await api.getRoomBySlug(slug);
+        setRoom(response.data || null);
       } catch (err) {
-        setError("Property not found or unavailable.");
-        setProperty(null);
-        setRooms([]);
+        setError("Room not found or unavailable.");
+        setRoom(null);
       } finally {
         setLoading(false);
       }
     };
 
     if (slug) {
-      loadProperty();
+      loadRoom();
     }
   }, [slug]);
 
@@ -41,42 +35,43 @@ function PropertyDetails() {
     return (
       <main className="flex min-h-[70vh] items-center justify-center px-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Loading property...</h1>
+          <h1 className="text-3xl font-bold">Loading room...</h1>
         </div>
       </main>
     );
   }
 
-  if (!property || error) {
+  if (!room || error) {
     return (
       <main className="flex min-h-[70vh] items-center justify-center px-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Property not found</h1>
+          <h1 className="text-3xl font-bold">Room not found</h1>
 
           <p className="mt-3 text-neutral-600 dark:text-neutral-400">
-            The property you're looking for isn't available.
+            The room you are looking for is not available.
           </p>
 
           <Link
-            to="/properties"
+            to="/rooms"
             className="mt-6 inline-flex items-center gap-2 font-semibold"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to stays
+            Back to rooms
           </Link>
         </div>
       </main>
     );
   }
 
+  const property = room.property || {};
   const destinationName = property.destination?.name || "Destination";
 
   return (
     <main>
       <section className="relative h-[55vh] min-h-[400px] overflow-hidden">
         <img
-          src={property.images?.[0] || property.image}
-          alt={property.name}
+          src={room.images?.[0] || property.images?.[0]}
+          alt={room.name}
           className="h-full w-full object-cover"
         />
 
@@ -90,14 +85,11 @@ function PropertyDetails() {
                 {destinationName} • {property.location}
               </div>
 
-              <h1 className="mt-3 text-5xl font-bold sm:text-6xl">
-                {property.name}
-              </h1>
+              <h1 className="mt-3 text-5xl font-bold sm:text-6xl">{room.name}</h1>
 
-              <div className="mt-4 flex items-center gap-2 text-white/90">
-                <Star className="h-4 w-4 fill-current text-yellow-400" />
-                {Number(property.rating || 0).toFixed(1)}
-              </div>
+              <p className="mt-4 text-lg text-white/90">
+                From ₹{room.pricePerNight} per night
+              </p>
             </div>
           </div>
         </div>
@@ -107,36 +99,25 @@ function PropertyDetails() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.6fr]">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-              Overview
+              Room overview
             </p>
 
             <h2 className="mt-3 text-3xl font-bold text-neutral-900 dark:text-white">
-              About this stay
+              Stay in {property.name}
             </h2>
 
             <p className="mt-4 text-lg leading-8 text-neutral-600 dark:text-neutral-300">
-              {property.description}
+              {room.description}
             </p>
 
-            {property.address && (
-              <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-                  Address
-                </p>
-                <p className="mt-2 text-neutral-700 dark:text-neutral-200">
-                  {property.address}
-                </p>
-              </div>
-            )}
-
-            {property.amenities?.length > 0 && (
+            {room.amenities?.length > 0 && (
               <div className="mt-8">
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
                   Amenities
                 </p>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {property.amenities.map((amenity) => (
+                  {room.amenities.map((amenity) => (
                     <span
                       key={amenity}
                       className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
@@ -151,48 +132,41 @@ function PropertyDetails() {
 
           <aside className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-              Stay details
+              Room details
             </p>
 
             <div className="mt-4 space-y-3 text-neutral-700 dark:text-neutral-200">
-              <p>
-                <span className="font-semibold">Location:</span> {property.location}
+              <p className="flex items-center gap-2">
+                <BedDouble className="h-4 w-4" />
+                <span className="font-semibold">Bed:</span> {room.bedType}
+              </p>
+              <p className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span className="font-semibold">Capacity:</span> {room.capacity} guests
               </p>
               <p>
-                <span className="font-semibold">Destination:</span> {destinationName}
+                <span className="font-semibold">Room size:</span> {room.roomSize} sq ft
               </p>
               <p>
-                <span className="font-semibold">Rating:</span> {Number(property.rating || 0).toFixed(1)} / 5
+                <span className="font-semibold">Available rooms:</span> {room.availableRooms} / {room.totalRooms}
+              </p>
+              <p>
+                <span className="font-semibold">Price:</span> ₹{room.pricePerNight}/night
               </p>
             </div>
 
             <Link
-              to="/properties"
+              to={property.slug ? `/properties/${property.slug}` : "/properties"}
               className="mt-6 inline-flex items-center gap-2 font-semibold text-neutral-900 dark:text-white"
             >
               <ArrowLeft className="h-4 w-4" />
-              Explore more stays
+              Back to stay
             </Link>
           </aside>
-        </div>
-      </section>
-
-      <section className="border-t border-neutral-200 bg-neutral-50 py-16 dark:border-neutral-800 dark:bg-neutral-950">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mb-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
-              Rooms
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-neutral-900 dark:text-white">
-              Available room options
-            </h2>
-          </div>
-
-          <RoomGrid rooms={rooms} />
         </div>
       </section>
     </main>
   );
 }
 
-export default PropertyDetails;
+export default RoomDetails;

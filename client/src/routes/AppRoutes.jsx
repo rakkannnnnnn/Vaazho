@@ -17,6 +17,7 @@ import SignUpPage from "@/pages/SignUp/SignUp";
 import Account from "@/pages/Account/Account";
 import Properties from "@/pages/Properties/Properties";
 import PropertyDetails from "@/pages/PropertyDetails/PropertyDetails";
+import RoomDetails from "@/pages/RoomDetails/RoomDetails";
 import { useAuth } from "@clerk/react";
 
 function ProtectedAccount() {
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/rooms" element={<Rooms />} />
+          <Route path="/rooms/:slug" element={<RoomDetails />} />
           <Route
             path="/destinations"
             element={<Destinations />}

@@ -12,10 +12,18 @@ const roomSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     description: {
       type: String,
+      required: true,
+      trim: true,
     },
-    price: {
+    pricePerNight: {
       type: Number,
       required: true,
       min: 0,
@@ -25,9 +33,20 @@ const roomSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    bedType: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    roomSize: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
     amenities: [
       {
         type: String,
+        trim: true,
       },
     ],
     images: [
@@ -35,9 +54,25 @@ const roomSchema = new mongoose.Schema(
         type: String,
       },
     ],
-    available: {
+    totalRooms: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    availableRooms: {
+      type: Number,
+      required: true,
+      min: 0,
+      validate: {
+        validator: function (value) {
+          return value <= this.totalRooms;
+        },
+        message: "availableRooms cannot exceed totalRooms.",
+      },
+    },
+    featured: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   {

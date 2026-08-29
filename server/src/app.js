@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const destinationRoutes = require("./routes/destinationRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
+const roomRoutes = require("./routes/roomRoutes");
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/destinations", destinationRoutes);
 app.use("/api/properties", propertyRoutes);
+app.use("/api/rooms", roomRoutes);
 
 module.exports = app;

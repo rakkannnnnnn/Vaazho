@@ -1,14 +1,42 @@
 
+import { useEffect, useState } from "react";
+
 import Hero from "@/components/home/Hero";
 import DestinationSection from "@/components/destinations/DestinationSection";
-import { destinations } from "@/data/destinations";
+import { api } from "@/lib/api";
 
 function Home() {
+  const [destinations, setDestinations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadDestinations = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await api.getDestinations();
+        setDestinations(response.data || []);
+      } catch (err) {
+        setError("Unable to load destinations. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDestinations();
+  }, []);
+
   return (
     <main className="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-white">
       <Hero />
 
-      <DestinationSection destinations={destinations} />
+      <DestinationSection
+        destinations={destinations}
+        loading={loading}
+        error={error}
+      />
 
       <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="max-w-2xl">

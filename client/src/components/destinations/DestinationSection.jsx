@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 import DestinationGrid from "./DestinationGrid";
 
-function DestinationSection({ destinations = [] }) {
+function DestinationSection({ destinations = [], loading = false, error = "" }) {
   return (
     <section className="bg-white py-16 dark:bg-neutral-950">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -29,7 +29,21 @@ function DestinationSection({ destinations = [] }) {
           </Link>
         </div>
 
-        <DestinationGrid destinations={destinations} />
+        {loading && (
+          <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center dark:border-neutral-800 dark:bg-neutral-900">
+            <p className="text-neutral-600 dark:text-neutral-400">
+              Loading destinations...
+            </p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-red-600 dark:border-red-900/60 dark:bg-red-900/10 dark:text-red-400">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && <DestinationGrid destinations={destinations} />}
       </div>
     </section>
   );

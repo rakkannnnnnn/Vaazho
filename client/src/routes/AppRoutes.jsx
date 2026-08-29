@@ -43,7 +43,7 @@ function AppRoutes() {
             element={<Destinations />}
           />
           <Route
-            path="/destinations/:destinationId"
+            path="/destinations/:slug"
             element={<DestinationDetail />}
           />
           <Route

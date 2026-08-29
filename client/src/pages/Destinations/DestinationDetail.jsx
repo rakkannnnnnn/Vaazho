@@ -1,38 +1,72 @@
 import { ArrowLeft, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { destinations } from "@/data/destinations";
+import { api } from "@/lib/api";
 
 function DestinationDetail() {
-  const { destinationId } = useParams();
+  const { slug } = useParams();
+  const [destination, setDestination] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const destination = destinations.find(
-    (item) => item.id === destinationId
-  );
+  useEffect(() => {
+    const loadDestination = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-  if (!destination) {
+        const response = await api.getDestinationBySlug(slug);
+        setDestination(response.data || null);
+      } catch (err) {
+        setError("Destination not found or unable to load this destination.");
+        setDestination(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      loadDestination();
+    }
+  }, [slug]);
+
+  if (loading) {
     return (
       <main className="flex min-h-[70vh] items-center justify-center px-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">
-            Destination not found
-          </h1>
+          <h1 className="text-3xl font-bold">Loading destination...</h1>
+        </div>
+      </main>
+    );
+  }
+
+  if (!destination || error) {
+    return (
+      <main className="flex min-h-[70vh] items-center justify-center px-6">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">Destination not found</h1>
 
           <p className="mt-3 text-neutral-600">
             The destination you're looking for doesn't exist.
           </p>
 
           <Link
-            to="/"
+            to="/destinations"
             className="mt-6 inline-flex items-center gap-2 font-semibold"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back home
+            Back to destinations
           </Link>
         </div>
       </main>
     );
   }
+
+  const destinationLocation =
+    typeof destination.location === "string"
+      ? destination.location
+      : destination.location?.city || destination.location?.country || "Destination";
 
   return (
     <main>
@@ -50,7 +84,7 @@ function DestinationDetail() {
             <div className="max-w-3xl text-white">
               <div className="flex items-center gap-2 text-sm text-white/80">
                 <MapPin className="h-4 w-4" />
-                {destination.location}
+                {destinationLocation}
               </div>
 
               <h1 className="mt-3 text-5xl font-bold sm:text-6xl">

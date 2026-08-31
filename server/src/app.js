@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 
+const authRoutes = require("./routes/authRoutes");
 const destinationRoutes = require("./routes/destinationRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
 const roomRoutes = require("./routes/roomRoutes");
@@ -9,15 +10,12 @@ const customizationRoutes = require("./routes/customizationRoutes");
 
 const app = express();
 
-
 // =====================================================
 // MIDDLEWARE
 // =====================================================
 
 app.use(cors());
-
 app.use(express.json());
-
 
 // =====================================================
 // HEALTH CHECK
@@ -30,21 +28,16 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-
 // =====================================================
 // API ROUTES
 // =====================================================
 
+app.use("/api/auth", authRoutes);
 app.use("/api/destinations", destinationRoutes);
-
 app.use("/api/properties", propertyRoutes);
-
 app.use("/api/rooms", roomRoutes);
-
 app.use("/api/bookings", bookingRoutes);
-
 app.use("/api/customizations", customizationRoutes);
-
 
 // =====================================================
 // EXPORT APP

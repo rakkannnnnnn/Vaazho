@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
 const Customization = require("../models/Customization");
-const User = require("../models/User");
 
 // =====================================================
 // CHECK AVAILABILITY
@@ -103,8 +102,8 @@ const checkAvailability = async (req, res) => {
       (endDate.getTime() - startDate.getTime()) / millisecondsPerDay
     );
 
-    // Authoritative room pricing from MongoDB
-    const pricePerNight = Number(room.pricePerNight ?? room.price ?? 0);
+    // Authoritative room pricing strictly from Room.pricePerNight in MongoDB
+    const pricePerNight = Number(room.pricePerNight ?? 0);
     const roomTotal = pricePerNight * numberOfNights;
 
     return res.status(200).json({
@@ -140,11 +139,18 @@ const checkAvailability = async (req, res) => {
 };
 
 // =====================================================
-// CREATE BOOKING
+// CREATE BOOKING (Protected with Custom JWT Authentication)
 // =====================================================
 const createBooking = async (req, res) => {
   try {
     const { roomId, checkIn, checkOut, guests, customizations = [] } = req.body;
+
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
 
     // Validate required fields
     if (!roomId || !checkIn || !checkOut || !guests) {
@@ -231,14 +237,14 @@ const createBooking = async (req, res) => {
       });
     }
 
-    // Calculate nights
+    // Calculate nights server-side
     const millisecondsPerDay = 1000 * 60 * 60 * 24;
     const numberOfNights = Math.ceil(
       (endDate.getTime() - startDate.getTime()) / millisecondsPerDay
     );
 
-    // Backend is the single source of truth for room pricing
-    const pricePerNight = Number(room.pricePerNight ?? room.price ?? 0);
+    // Authoritative room pricing strictly from Room.pricePerNight in MongoDB
+    const pricePerNight = Number(room.pricePerNight ?? 0);
     const roomTotal = pricePerNight * numberOfNights;
 
     // =====================================================
@@ -318,36 +324,12 @@ const createBooking = async (req, res) => {
       }
     }
 
-    // Final total calculation
+    // Authoritative final total calculation
     const finalTotal = roomTotal + customizationTotal;
 
-    // =====================================================
-    // RESOLVE USER (Clerk or Guest)
-    // =====================================================
-    let userRecord = null;
-    const clerkId = req.auth?.userId || req.body.clerkId || req.headers["x-clerk-user-id"];
-
-    if (clerkId) {
-      userRecord = await User.findOne({ clerkId });
-      if (!userRecord && req.body.email) {
-        try {
-          userRecord = await User.create({
-            clerkId,
-            email: req.body.email,
-            firstName: req.body.firstName || "",
-            lastName: req.body.lastName || "",
-          });
-        } catch (uErr) {
-          console.warn("Could not upsert user record:", uErr.message);
-        }
-      }
-    } else if (req.body.userId && mongoose.Types.ObjectId.isValid(req.body.userId)) {
-      userRecord = await User.findById(req.body.userId);
-    }
-
-    // Create authoritative booking
+    // Create authoritative booking in MongoDB tied to authenticated user
     const booking = await Booking.create({
-      user: userRecord?._id || undefined,
+      user: req.user._id,
       property: room.property,
       room: room._id,
       checkIn: startDate,
@@ -397,7 +379,184 @@ const createBooking = async (req, res) => {
   }
 };
 
+// =====================================================
+// GET MY BOOKINGS (Authenticated Customer)
+// =====================================================
+const getMyBookings = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const bookings = await Booking.find({ user: req.user._id })
+      .populate("property", "name slug location address images rating featured")
+      .populate(
+        "room",
+        "name slug pricePerNight capacity bedType roomSize amenities images featured"
+      )
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      bookings,
+    });
+  } catch (error) {
+    console.error("GET MY BOOKINGS ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch bookings.",
+      error:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// =====================================================
+// GET BOOKING DETAILS (Authenticated Customer)
+// =====================================================
+const getBookingById = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found.",
+      });
+    }
+
+    const booking = await Booking.findById(bookingId)
+      .populate("property", "name slug location address images amenities rating description")
+      .populate(
+        "room",
+        "name slug pricePerNight capacity bedType roomSize amenities images description"
+      );
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found.",
+      });
+    }
+
+    // Check ownership against the authenticated user's MongoDB ObjectId
+    const bookingUserId = booking.user?._id
+      ? booking.user._id.toString()
+      : booking.user?.toString();
+
+    if (!bookingUserId || bookingUserId !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to view this booking.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      booking,
+    });
+  } catch (error) {
+    console.error("GET BOOKING BY ID ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch booking details.",
+      error:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// =====================================================
+// CANCEL BOOKING (Authenticated Customer)
+// =====================================================
+const cancelBooking = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found.",
+      });
+    }
+
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found.",
+      });
+    }
+
+    // Verify ownership
+    const bookingUserId = booking.user?.toString();
+
+    if (!bookingUserId || bookingUserId !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to cancel this booking.",
+      });
+    }
+
+    // Check cancellation rules: cannot cancel if already cancelled or completed
+    if (booking.status === "cancelled" || booking.status === "completed") {
+      return res.status(400).json({
+        success: false,
+        message: "This booking cannot be cancelled.",
+      });
+    }
+
+    // Perform cancellation: update status, keep record and payment status
+    booking.status = "cancelled";
+    await booking.save();
+
+    // Populate for response
+    await booking.populate([
+      { path: "property", select: "name slug location address images rating" },
+      { path: "room", select: "name slug pricePerNight capacity bedType roomSize amenities images" },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking cancelled successfully.",
+      booking,
+    });
+  } catch (error) {
+    console.error("CANCEL BOOKING ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to cancel booking.",
+      error:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   checkAvailability,
   createBooking,
+  getMyBookings,
+  getBookingById,
+  cancelBooking,
 };

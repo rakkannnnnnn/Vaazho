@@ -1,8 +1,12 @@
-import { Menu, X } from "lucide-react";
+import React from "react";
+import { LogOut, Menu, User, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import { navLinks } from "./navLinks";
 
 function MobileNav({ open, onToggle, onNavigate }) {
+  const { user, isAuthenticated, logout } = useAuth();
+
   return (
     <div className="md:hidden">
       <button
@@ -36,15 +40,56 @@ function MobileNav({ open, onToggle, onNavigate }) {
             ))}
           </nav>
 
-          <div className="mt-3 border-t pt-3">
-            <NavLink
-              to="/bookings"
-              onClick={onNavigate}
-              className="block rounded-lg px-4 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
-            >
-              My Bookings
-            </NavLink>
-          </div>
+          {isAuthenticated && user ? (
+            <div className="mt-3 space-y-1 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+              <NavLink
+                to="/bookings"
+                onClick={onNavigate}
+                className="block rounded-lg px-4 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
+              >
+                My Bookings
+              </NavLink>
+
+              <NavLink
+                to="/account"
+                onClick={onNavigate}
+                className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
+              >
+                <User className="h-4 w-4" />
+                <span>Account ({user.name})</span>
+              </NavLink>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onNavigate();
+                  logout();
+                }}
+                className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <div className="mt-3 flex gap-2 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+              <NavLink
+                to="/login"
+                onClick={onNavigate}
+                className="flex-1 rounded-xl border border-neutral-200 py-2.5 text-center text-sm font-semibold text-neutral-900 dark:border-neutral-800 dark:text-white"
+              >
+                Sign In
+              </NavLink>
+
+              <NavLink
+                to="/register"
+                onClick={onNavigate}
+                className="flex-1 rounded-xl bg-neutral-900 py-2.5 text-center text-sm font-semibold text-white dark:bg-white dark:text-neutral-950"
+              >
+                Sign Up
+              </NavLink>
+            </div>
+          )}
         </div>
       )}
     </div>

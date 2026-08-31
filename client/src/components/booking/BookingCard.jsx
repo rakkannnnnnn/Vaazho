@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 import { api } from "@/lib/api";
 import CustomizationSelector, {
@@ -27,6 +28,7 @@ function getTodayDateString() {
 }
 
 function BookingCard({ room }) {
+  const { user, isAuthenticated } = useAuth();
   const today = getTodayDateString();
   const defaultCheckIn = getTomorrowDateString(new Date());
   const defaultCheckOut = getTomorrowDateString(new Date(Date.now() + 86400000));

@@ -7,6 +7,7 @@ const propertyRoutes = require("./routes/propertyRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const customizationRoutes = require("./routes/customizationRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/api/properties", propertyRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/customizations", customizationRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // =====================================================
 // EXPORT APP

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
@@ -31,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { StatusBadge, PaymentBadge } from "@/components/bookings/BookingCard";
+import PaymentButton from "@/components/payment/PaymentButton";
 
 function formatDate(dateString) {
   if (!dateString) return "N/A";
@@ -84,7 +86,9 @@ function BookingDetails() {
     try {
       setLoading(true);
       setError(null);
+
       const res = await api.getBookingById(bookingId);
+
       if (res && res.success && res.booking) {
         setBooking(res.booking);
       } else {
@@ -110,7 +114,9 @@ function BookingDetails() {
     try {
       setCancelling(true);
       setCancelError("");
+
       const res = await api.cancelBooking(bookingId);
+
       if (res && res.success) {
         setBooking(res.booking);
         setCancelSuccessMessage("Booking cancelled successfully.");
@@ -136,17 +142,21 @@ function BookingDetails() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400">
             <AlertCircle className="h-8 w-8" />
           </div>
+
           <h2 className="mt-4 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Booking Details Unavailable
           </h2>
+
           <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
             {error || "We could not find the requested booking record."}
           </p>
+
           <div className="mt-6 flex justify-center gap-3">
             <Button onClick={() => navigate("/bookings")} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to My Bookings
             </Button>
+
             <Button onClick={loadBooking}>
               <RefreshCw className="mr-2 h-4 w-4" />
               Try Again
@@ -159,16 +169,20 @@ function BookingDetails() {
 
   const property = booking.property || {};
   const room = booking.room || {};
+
+  // User information for PaymentButton
+  const user = booking.user || {};
+
   const isCancellable =
     booking.status !== "cancelled" && booking.status !== "completed";
 
   const bookingRef = (booking._id || "").slice(-8).toUpperCase();
+
   const propertyImage =
     property.images?.[0] ||
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80";
-  const roomImage =
-    room.images?.[0] ||
-    propertyImage;
+
+  const roomImage = room.images?.[0] || propertyImage;
 
   return (
     <main className="min-h-screen bg-neutral-50/50 pb-24 pt-8 dark:bg-neutral-950">
@@ -195,6 +209,7 @@ function BookingDetails() {
               <CheckCircle2 className="h-5 w-5 text-rose-600 dark:text-rose-400" />
               <span>{cancelSuccessMessage}</span>
             </div>
+
             <button
               onClick={() => setCancelSuccessMessage("")}
               className="text-xs font-semibold underline hover:opacity-75"
@@ -211,9 +226,11 @@ function BookingDetails() {
               <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900 sm:text-3xl dark:text-white">
                 Booking #{bookingRef}
               </h1>
+
               <StatusBadge status={booking.status} />
               <PaymentBadge paymentStatus={booking.paymentStatus} />
             </div>
+
             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
               Reserved on {formatDate(booking.createdAt)}
             </p>
@@ -244,14 +261,18 @@ function BookingDetails() {
                   alt={room.name || property.name}
                   className="h-full w-full object-cover"
                 />
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
                 <div className="absolute bottom-4 left-4 right-4 text-white">
                   <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold backdrop-blur-md">
                     {room.type || "Suite"}
                   </span>
+
                   <h2 className="mt-1.5 text-xl font-bold sm:text-2xl">
                     {room.name || "Room Details"}
                   </h2>
+
                   <p className="flex items-center gap-1.5 text-sm text-neutral-200">
                     <Building className="h-4 w-4 shrink-0" />
                     {property.name}
@@ -263,10 +284,12 @@ function BookingDetails() {
                 {property.location && (
                   <div className="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-300">
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
+
                     <div>
                       <p className="font-medium text-neutral-900 dark:text-white">
                         {property.location}
                       </p>
+
                       {property.address && (
                         <p className="text-xs text-neutral-500 dark:text-neutral-400">
                           {property.address}
@@ -281,21 +304,26 @@ function BookingDetails() {
                   {room.bedType && (
                     <div className="rounded-xl bg-neutral-50 p-3 dark:bg-neutral-800/50">
                       <Bed className="mx-auto h-4 w-4 text-neutral-500" />
+
                       <span className="mt-1 block text-xs font-medium text-neutral-700 dark:text-neutral-300">
                         {room.bedType}
                       </span>
                     </div>
                   )}
+
                   {room.roomSize && (
                     <div className="rounded-xl bg-neutral-50 p-3 dark:bg-neutral-800/50">
                       <Maximize2 className="mx-auto h-4 w-4 text-neutral-500" />
+
                       <span className="mt-1 block text-xs font-medium text-neutral-700 dark:text-neutral-300">
                         {room.roomSize} sq ft
                       </span>
                     </div>
                   )}
+
                   <div className="rounded-xl bg-neutral-50 p-3 dark:bg-neutral-800/50">
                     <Users className="mx-auto h-4 w-4 text-neutral-500" />
+
                     <span className="mt-1 block text-xs font-medium text-neutral-700 dark:text-neutral-300">
                       Max {room.capacity || booking.guests} Guests
                     </span>
@@ -327,9 +355,11 @@ function BookingDetails() {
                   <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                     Check-in
                   </span>
+
                   <p className="mt-1 text-base font-bold text-neutral-900 dark:text-white">
                     {formatDate(booking.checkIn)}
                   </p>
+
                   <p className="mt-0.5 flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
                     <Clock className="h-3 w-3" />
                     From 2:00 PM
@@ -340,9 +370,11 @@ function BookingDetails() {
                   <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                     Check-out
                   </span>
+
                   <p className="mt-1 text-base font-bold text-neutral-900 dark:text-white">
                     {formatDate(booking.checkOut)}
                   </p>
+
                   <p className="mt-0.5 flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
                     <Clock className="h-3 w-3" />
                     Until 11:00 AM
@@ -358,6 +390,7 @@ function BookingDetails() {
                     {booking.numberOfNights === 1 ? "Night" : "Nights"}
                   </strong>
                 </span>
+
                 <span>
                   Reserved for:{" "}
                   <strong>
@@ -369,35 +402,39 @@ function BookingDetails() {
             </div>
 
             {/* Customizations Card */}
-            {booking.customizations && booking.customizations.length > 0 && (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-                <h3 className="flex items-center gap-2 text-base font-bold text-neutral-900 dark:text-white">
-                  <Sparkles className="h-4 w-4 text-indigo-500" />
-                  Selected Add-ons & Customizations ({booking.customizations.length})
-                </h3>
+            {booking.customizations &&
+              booking.customizations.length > 0 && (
+                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                  <h3 className="flex items-center gap-2 text-base font-bold text-neutral-900 dark:text-white">
+                    <Sparkles className="h-4 w-4 text-indigo-500" />
+                    Selected Add-ons & Customizations (
+                    {booking.customizations.length})
+                  </h3>
 
-                <div className="mt-4 divide-y divide-neutral-100 dark:divide-neutral-800">
-                  {booking.customizations.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between py-3 text-sm first:pt-0 last:pb-0"
-                    >
-                      <div>
-                        <p className="font-semibold text-neutral-900 dark:text-white">
-                          {item.name}
-                        </p>
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                          ₹{item.price} • {item.pricingType}
-                        </p>
+                  <div className="mt-4 divide-y divide-neutral-100 dark:divide-neutral-800">
+                    {booking.customizations.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between py-3 text-sm first:pt-0 last:pb-0"
+                      >
+                        <div>
+                          <p className="font-semibold text-neutral-900 dark:text-white">
+                            {item.name}
+                          </p>
+
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                            ₹{item.price} • {item.pricingType}
+                          </p>
+                        </div>
+
+                        <span className="font-bold text-neutral-900 dark:text-white">
+                          ₹{item.calculatedAmount}
+                        </span>
                       </div>
-                      <span className="font-bold text-neutral-900 dark:text-white">
-                        ₹{item.calculatedAmount}
-                      </span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
 
           {/* Right Column: Price Breakdown & Cancellation */}
@@ -415,21 +452,24 @@ function BookingDetails() {
                     Room (₹{booking.pricePerNight} × {booking.numberOfNights}{" "}
                     {booking.numberOfNights === 1 ? "night" : "nights"})
                   </span>
+
                   <span className="font-medium text-neutral-900 dark:text-white">
                     ₹{booking.roomTotal}
                   </span>
                 </div>
 
-                {booking.customizations && booking.customizations.length > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-neutral-600 dark:text-neutral-400">
-                      Customizations Total
-                    </span>
-                    <span className="font-medium text-neutral-900 dark:text-white">
-                      ₹{booking.customizationTotal || 0}
-                    </span>
-                  </div>
-                )}
+                {booking.customizations &&
+                  booking.customizations.length > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-600 dark:text-neutral-400">
+                        Customizations Total
+                      </span>
+
+                      <span className="font-medium text-neutral-900 dark:text-white">
+                        ₹{booking.customizationTotal || 0}
+                      </span>
+                    </div>
+                  )}
 
                 <div className="flex justify-between text-xs text-neutral-400">
                   <span>Taxes & Service Fees</span>
@@ -443,12 +483,32 @@ function BookingDetails() {
                   <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
                     Total Amount
                   </span>
+
                   <div className="text-2xl font-black text-neutral-900 dark:text-white">
-                    ₹{Number(booking.totalAmount || 0).toLocaleString("en-IN")}
+                    ₹
+                    {Number(booking.totalAmount || 0).toLocaleString("en-IN")}
                   </div>
                 </div>
+
                 <PaymentBadge paymentStatus={booking.paymentStatus} />
               </div>
+
+              {/* Payment Button */}
+              {booking.paymentStatus !== "paid" &&
+                booking.status !== "cancelled" && (
+                  <div className="mt-6">
+                    <PaymentButton
+                      bookingId={booking._id}
+                      amount={booking.totalAmount}
+                      user={user}
+                      onSuccess={(updatedBooking) => {
+                        console.log("Updated booking:", updatedBooking);
+
+                        setBooking(updatedBooking);
+                      }}
+                    />
+                  </div>
+                )}
 
               {/* Cancellation policy note */}
               <div className="mt-6 rounded-xl bg-neutral-50 p-3.5 text-xs text-neutral-500 dark:bg-neutral-800/40 dark:text-neutral-400">
@@ -456,6 +516,7 @@ function BookingDetails() {
                   <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
                   Free cancellation prior to check-in.
                 </p>
+
                 <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-500">
                   Cancellations are saved to your booking record.
                 </p>
@@ -485,12 +546,15 @@ function BookingDetails() {
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400">
               <AlertCircle className="h-6 w-6" />
             </div>
+
             <DialogTitle className="text-center text-lg font-bold">
               Cancel this booking?
             </DialogTitle>
+
             <DialogDescription className="text-center text-sm text-neutral-600 dark:text-neutral-400">
               Are you sure you want to cancel your reservation at{" "}
-              <strong>{property.name}</strong> for {formatDate(booking.checkIn)}?
+              <strong>{property.name}</strong> for{" "}
+              {formatDate(booking.checkIn)}?
             </DialogDescription>
           </DialogHeader>
 
@@ -509,6 +573,7 @@ function BookingDetails() {
             >
               Keep Booking
             </Button>
+
             <Button
               type="button"
               variant="destructive"

@@ -85,6 +85,11 @@ export const api = {
     }),
   getMyAIPlans: () => fetchJson("/api/ai/plans"),
   getAIPlanById: (planId) => fetchJson(`/api/ai/plans/${planId}`),
+  updateAIPlan: (planId, planData) =>
+    fetchJson(`/api/ai/plans/${planId}`, {
+      method: "PATCH",
+      body: JSON.stringify(planData),
+    }),
   deleteAIPlan: (planId) =>
     fetchJson(`/api/ai/plans/${planId}`, {
       method: "DELETE",

@@ -350,6 +350,168 @@ const getAIPlanById = async (req, res) => {
   }
 };
 
+const updateAIPlan = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const { id } = req.params;
+
+    const plan = await AIPlan.findById(id);
+
+    if (!plan) {
+      return res.status(404).json({
+        success: false,
+        message: "Travel plan not found.",
+      });
+    }
+
+    if (plan.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update this travel plan.",
+      });
+    }
+
+    const updateData = {};
+    const hasField = (field) =>
+      Object.prototype.hasOwnProperty.call(req.body, field) &&
+      req.body[field] !== undefined;
+
+    if (hasField("title")) {
+      const title = String(req.body.title).trim();
+      if (!title) {
+        return res.status(400).json({
+          success: false,
+          message: "Plan title is required.",
+        });
+      }
+      updateData.title = title;
+    }
+
+    if (hasField("destination")) {
+      const destination = String(req.body.destination).trim();
+      if (!destination) {
+        return res.status(400).json({
+          success: false,
+          message: "Destination is required.",
+        });
+      }
+      updateData.destination = destination;
+    }
+
+    if (hasField("days")) {
+      const parsedDays = Number(req.body.days);
+      if (!Number.isInteger(parsedDays) || parsedDays < 1) {
+        return res.status(400).json({
+          success: false,
+          message: "Days must be a valid number greater than 0.",
+        });
+      }
+      updateData.days = parsedDays;
+    }
+
+    if (hasField("travelers")) {
+      const parsedTravelers = Number(req.body.travelers);
+      if (!Number.isInteger(parsedTravelers) || parsedTravelers < 1) {
+        return res.status(400).json({
+          success: false,
+          message: "Travelers must be a valid number greater than 0.",
+        });
+      }
+      updateData.travelers = parsedTravelers;
+    }
+
+    if (hasField("budget")) {
+      updateData.budget = String(req.body.budget || "medium").trim() || "medium";
+    }
+
+    if (hasField("interests")) {
+      const interests = String(req.body.interests).trim();
+      if (!interests) {
+        return res.status(400).json({
+          success: false,
+          message: "Interests are required.",
+        });
+      }
+      updateData.interests = interests;
+    }
+
+    if (hasField("summary")) {
+      const summary = String(req.body.summary).trim();
+      if (!summary) {
+        return res.status(400).json({
+          success: false,
+          message: "Plan summary is required.",
+        });
+      }
+      updateData.summary = summary;
+    }
+
+    if (hasField("itinerary")) {
+      if (!Array.isArray(req.body.itinerary) || req.body.itinerary.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one itinerary day is required.",
+        });
+      }
+
+      const normalizedItinerary = req.body.itinerary.map((day) => ({
+        title: String(day?.title || "").trim(),
+        description: String(day?.description || "").trim(),
+        activities: Array.isArray(day?.activities)
+          ? day.activities.map((activity) => String(activity).trim()).filter(Boolean)
+          : [],
+      }));
+
+      if (normalizedItinerary.some((day) => !day.title || !day.description)) {
+        return res.status(400).json({
+          success: false,
+          message: "Each itinerary day must include a title and description.",
+        });
+      }
+
+      updateData.itinerary = normalizedItinerary;
+    }
+
+    if (hasField("tips")) {
+      updateData.tips = Array.isArray(req.body.tips)
+        ? req.body.tips.map((tip) => String(tip).trim()).filter(Boolean)
+        : [];
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields provided for update.",
+      });
+    }
+
+    const updatedPlan = await AIPlan.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Travel plan updated successfully.",
+      plan: updatedPlan,
+    });
+  } catch (error) {
+    console.error("UPDATE AI PLAN ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update travel plan.",
+    });
+  }
+};
+
 const deleteAIPlan = async (req, res) => {
   try {
     if (!req.user || !req.user._id) {
@@ -399,5 +561,6 @@ module.exports = {
   saveAIPlan,
   getMyAIPlans,
   getAIPlanById,
+  updateAIPlan,
   deleteAIPlan,
 };

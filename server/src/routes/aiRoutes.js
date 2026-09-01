@@ -7,6 +7,7 @@ const {
   saveAIPlan,
   getMyAIPlans,
   getAIPlanById,
+  updateAIPlan,
   deleteAIPlan,
 } = require("../controllers/aiController");
 
@@ -17,6 +18,7 @@ router.post("/plan", generateTravelPlan);
 router.post("/plans", requireAuth, saveAIPlan);
 router.get("/plans", requireAuth, getMyAIPlans);
 router.get("/plans/:id", requireAuth, getAIPlanById);
+router.patch("/plans/:id", requireAuth, updateAIPlan);
 router.delete("/plans/:id", requireAuth, deleteAIPlan);
 
 module.exports = router;

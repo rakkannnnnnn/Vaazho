@@ -86,6 +86,22 @@ export const deleteAIPlan = async (id) => {
   return data;
 };
 
+export const updateAIPlan = async (id, data) => {
+  const response = await fetch(`${API_BASE_URL}/ai/plans/${id}`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  const responseData = await response.json();
+
+  if (!response.ok) {
+    throw new Error(responseData.message || "Failed to update travel plan.");
+  }
+
+  return responseData;
+};
+
 export const generateTravelPlan = async ({
   destination,
   days,

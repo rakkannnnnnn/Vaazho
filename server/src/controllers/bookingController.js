@@ -2,6 +2,13 @@ const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
 const Customization = require("../models/Customization");
+const Voucher = require("../models/Voucher");
+const { generateVoucherCode } = require("../utils/voucher");
+
+const {
+  sendBookingConfirmationEmail,
+  sendPaymentConfirmationEmail,
+} = require("../services/emailService");
 
 // =====================================================
 // CHECK AVAILABILITY
@@ -143,7 +150,14 @@ const checkAvailability = async (req, res) => {
 // =====================================================
 const createBooking = async (req, res) => {
   try {
-    const { roomId, checkIn, checkOut, guests, customizations = [] } = req.body;
+    const {
+      roomId,
+      checkIn,
+      checkOut,
+      guests,
+      customizations = [],
+      customerEmail,
+    } = req.body;
 
     if (!req.user || !req.user._id) {
       return res.status(401).json({
@@ -213,6 +227,19 @@ const createBooking = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: `Room can accommodate a maximum of ${room.capacity} guests.`,
+      });
+    }
+
+    const normalizedCustomerEmail =
+      typeof customerEmail === "string" ? customerEmail.trim().toLowerCase() : "";
+
+    if (
+      normalizedCustomerEmail &&
+      !/^\S+@\S+\.\S+$/.test(normalizedCustomerEmail)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Customer email is invalid.",
       });
     }
 
@@ -341,6 +368,7 @@ const createBooking = async (req, res) => {
       customizations: bookingCustomizations,
       customizationTotal,
       totalAmount: finalTotal,
+      customerEmail: normalizedCustomerEmail || req.user.email || undefined,
       status: "confirmed",
       paymentStatus: "unpaid",
     });
@@ -362,6 +390,7 @@ const createBooking = async (req, res) => {
         customizations: booking.customizations,
         customizationTotal: booking.customizationTotal,
         totalAmount: booking.totalAmount,
+        customerEmail: booking.customerEmail,
         status: booking.status,
         paymentStatus: booking.paymentStatus,
         createdAt: booking.createdAt,
@@ -552,6 +581,60 @@ const cancelBooking = async (req, res) => {
     });
   }
 };
+const createVoucherForBooking = async (booking) => {
+  const voucherCode = generateVoucherCode();
+
+  const voucher = await Voucher.create({
+    booking: booking._id,
+    user: booking.user,
+    voucherCode,
+    status: "active",
+  });
+
+  booking.voucher = voucher._id;
+
+  await booking.save();
+
+  return voucher;
+};
+
+const getVoucherByBookingId = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    const booking = await Booking.findById(bookingId)
+      .populate("voucher")
+      .populate("room")
+      .populate("property");
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found.",
+      });
+    }
+
+    if (!booking.voucher) {
+      return res.status(404).json({
+        success: false,
+        message: "Voucher has not been generated yet.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      voucher: booking.voucher,
+      booking,
+    });
+  } catch (error) {
+    console.error("Get voucher error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get voucher.",
+    });
+  }
+};
 
 module.exports = {
   checkAvailability,
@@ -559,4 +642,6 @@ module.exports = {
   getMyBookings,
   getBookingById,
   cancelBooking,
+  getVoucherByBookingId,
+  createVoucherForBooking,
 };

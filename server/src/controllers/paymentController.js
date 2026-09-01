@@ -2,6 +2,13 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 
 const Booking = require("../models/Booking");
+const {
+  createVoucherForBooking,
+} = require("../controllers/bookingController");
+const {
+  sendBookingConfirmationEmail,
+  sendPaymentConfirmationEmail,
+} = require("../services/emailService");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -208,15 +215,50 @@ const verifyPayment = async (req, res) => {
 
     booking.razorpayPaymentId = razorpay_payment_id;
     booking.razorpaySignature = razorpay_signature;
+    booking.paymentId = razorpay_payment_id;
     booking.paymentStatus = "paid";
     booking.status = "confirmed";
 
     await booking.save();
 
+    const customerEmail = booking.customerEmail || req.user?.email;
+    let voucher = null;
+
+    try {
+      voucher = await createVoucherForBooking(booking);
+    } catch (voucherError) {
+      console.error("Voucher generation failed after successful payment:", voucherError);
+    }
+
+    try {
+      if (customerEmail && voucher) {
+        await sendBookingConfirmationEmail({
+          email: customerEmail,
+          booking,
+          voucher,
+        });
+      }
+    } catch (emailError) {
+      console.error("Booking confirmation email failed after successful payment:", emailError);
+    }
+
+    try {
+      if (customerEmail) {
+        await sendPaymentConfirmationEmail({
+          email: customerEmail,
+          booking,
+          paymentId: razorpay_payment_id,
+        });
+      }
+    } catch (emailError) {
+      console.error("Payment confirmation email failed after successful payment:", emailError);
+    }
+
     return res.status(200).json({
       success: true,
       message: "Payment verified successfully.",
       booking,
+      voucher,
     });
   } catch (error) {
     console.error("Payment verification error:", error);

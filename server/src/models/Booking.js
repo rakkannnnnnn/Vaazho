@@ -101,6 +101,22 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    customerEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+
+    voucher: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Voucher",
+      default: null,
+    },
+
+    paymentId: {
+      type: String,
+      default: null,
+    },
 
     status: {
       type: String,

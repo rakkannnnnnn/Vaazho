@@ -7,7 +7,6 @@ import MainLayout from "@/layouts/MainLayout";
 import Home from "@/pages/Home/Home";
 import Rooms from "@/pages/Rooms/Rooms";
 import Destinations from "@/pages/Destinations/Destinations";
-import AIPlanner from "@/pages/AIPlanner/AIPlanner";
 import MyBookings from "@/pages/MyBookings/MyBookings";
 import BookingDetails from "@/pages/BookingDetails/BookingDetails";
 import DestinationDetail from "@/pages/Destinations/DestinationDetail";
@@ -23,6 +22,7 @@ import Properties from "@/pages/Properties/Properties";
 import PropertyDetails from "@/pages/PropertyDetails/PropertyDetails";
 import RoomDetails from "@/pages/RoomDetails/RoomDetails";
 import AITest from "@/components/ai/AITest";
+import AIPlanner from "@/components/ai/AIPlanner";
 
 function ProtectedRoute({ children }) {
   const { loading, isAuthenticated } = useAuth();
@@ -64,7 +64,7 @@ function AppRoutes() {
           />
           <Route path="/ai-planner" element={<AIPlanner />} />
           <Route path="/ai-test" element={<AITest />} />
-          
+
           {/* Protected Routes */}
           <Route
             path="/bookings"
@@ -90,7 +90,6 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
-
           {/* Static Pages */}
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />

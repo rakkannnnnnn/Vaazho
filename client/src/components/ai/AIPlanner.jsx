@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { api } from "@/lib/api";
 import { generateTravelPlan } from "@/services/aiService";
 
 function AIPlanner() {
@@ -12,7 +13,9 @@ function AIPlanner() {
 
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [saveMessage, setSaveMessage] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -23,7 +26,7 @@ function AIPlanner() {
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleGeneratePlan = async (event) => {
     event.preventDefault();
 
     if (!formData.destination.trim()) {
@@ -39,6 +42,7 @@ function AIPlanner() {
     try {
       setLoading(true);
       setError("");
+      setSaveMessage("");
       setPlan(null);
 
       const result = await generateTravelPlan({
@@ -52,57 +56,70 @@ function AIPlanner() {
       setPlan(result.data);
     } catch (err) {
       console.error("AI planner error:", err);
-
-      setError(
-        err.message || "Unable to generate your travel plan."
-      );
+      setError(err.message || "Unable to generate your travel plan.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSavePlan = async () => {
+    if (!plan) return;
+
+    try {
+      setSaving(true);
+      setError("");
+      setSaveMessage("");
+
+      const payload = {
+        title: plan.title,
+        destination: formData.destination,
+        days: Number(formData.days),
+        travelers: Number(formData.travelers),
+        budget: formData.budget,
+        interests: formData.interests,
+        summary: plan.summary,
+        itinerary: Array.isArray(plan.days) ? plan.days : [],
+        tips: Array.isArray(plan.tips) ? plan.tips : [],
+      };
+
+      const response = await api.saveAIPlan(payload);
+
+      setSaveMessage(response.message || "Travel plan saved successfully.");
+    } catch (err) {
+      console.error("Save AI plan error:", err);
+      setError(err.message || "Failed to save travel plan.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleNewPlan = () => {
+    setPlan(null);
+    setError("");
+    setSaveMessage("");
+  };
+
   return (
-    <main className="min-h-screen bg-white px-6 py-12 text-neutral-900">
+    <main className="min-h-screen bg-neutral-50 px-4 py-10 text-neutral-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-
-        {/* HEADER */}
-
         <div className="mx-auto max-w-3xl text-center">
-
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-neutral-500">
             VAZHO AI
           </p>
-
           <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
             Plan your perfect trip
           </h1>
-
           <p className="mt-4 text-lg text-neutral-600">
-            Tell VAZHO where you want to go and what you love.
-            We'll create a personalized travel plan for you.
+            Tell VAZHO where you want to go and what you love. We&apos;ll create a personalized travel plan for you.
           </p>
-
         </div>
 
-        {/* FORM */}
-
-        <div className="mx-auto mt-12 max-w-3xl rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
-
-            {/* DESTINATION */}
-
+        <div className="mx-auto mt-10 max-w-3xl rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-8">
+          <form onSubmit={handleGeneratePlan} className="space-y-6">
             <div>
-              <label
-                htmlFor="destination"
-                className="block text-sm font-semibold"
-              >
+              <label htmlFor="destination" className="block text-sm font-semibold text-neutral-800">
                 Destination
               </label>
-
               <input
                 id="destination"
                 name="destination"
@@ -110,22 +127,15 @@ function AIPlanner() {
                 value={formData.destination}
                 onChange={handleChange}
                 placeholder="Example: Jaipur"
-                className="mt-2 w-full rounded-xl border border-neutral-300 px-4 py-3 outline-none transition focus:border-black"
+                className="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none transition focus:border-neutral-800"
               />
             </div>
 
-            {/* DAYS + TRAVELERS */}
-
             <div className="grid gap-6 sm:grid-cols-2">
-
               <div>
-                <label
-                  htmlFor="days"
-                  className="block text-sm font-semibold"
-                >
+                <label htmlFor="days" className="block text-sm font-semibold text-neutral-800">
                   Number of days
                 </label>
-
                 <input
                   id="days"
                   name="days"
@@ -134,18 +144,14 @@ function AIPlanner() {
                   max="30"
                   value={formData.days}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-xl border border-neutral-300 px-4 py-3 outline-none focus:border-black"
+                  className="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none focus:border-neutral-800"
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="travelers"
-                  className="block text-sm font-semibold"
-                >
+                <label htmlFor="travelers" className="block text-sm font-semibold text-neutral-800">
                   Travelers
                 </label>
-
                 <input
                   id="travelers"
                   name="travelers"
@@ -154,56 +160,32 @@ function AIPlanner() {
                   max="20"
                   value={formData.travelers}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-xl border border-neutral-300 px-4 py-3 outline-none focus:border-black"
+                  className="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none focus:border-neutral-800"
                 />
               </div>
-
             </div>
 
-            {/* BUDGET */}
-
             <div>
-
-              <label
-                htmlFor="budget"
-                className="block text-sm font-semibold"
-              >
+              <label htmlFor="budget" className="block text-sm font-semibold text-neutral-800">
                 Budget
               </label>
-
               <select
                 id="budget"
                 name="budget"
                 value={formData.budget}
                 onChange={handleChange}
-                className="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none focus:border-black"
+                className="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none focus:border-neutral-800"
               >
-                <option value="low">
-                  Budget
-                </option>
-
-                <option value="medium">
-                  Moderate
-                </option>
-
-                <option value="high">
-                  Luxury
-                </option>
+                <option value="low">Budget</option>
+                <option value="medium">Moderate</option>
+                <option value="high">Luxury</option>
               </select>
-
             </div>
 
-            {/* INTERESTS */}
-
             <div>
-
-              <label
-                htmlFor="interests"
-                className="block text-sm font-semibold"
-              >
+              <label htmlFor="interests" className="block text-sm font-semibold text-neutral-800">
                 Interests
               </label>
-
               <textarea
                 id="interests"
                 name="interests"
@@ -211,12 +193,9 @@ function AIPlanner() {
                 onChange={handleChange}
                 placeholder="Example: forts, food, shopping, culture, photography"
                 rows={4}
-                className="mt-2 w-full resize-none rounded-xl border border-neutral-300 px-4 py-3 outline-none focus:border-black"
+                className="mt-2 w-full resize-none rounded-xl border border-neutral-300 bg-white px-4 py-3 outline-none focus:border-neutral-800"
               />
-
             </div>
-
-            {/* ERROR */}
 
             {error && (
               <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -224,125 +203,108 @@ function AIPlanner() {
               </div>
             )}
 
-            {/* BUTTON */}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 rounded-xl bg-black px-6 py-4 font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? "Creating your travel plan..." : "Generate Travel Plan"}
+              </button>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl bg-black px-6 py-4 font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading
-                ? "Creating your travel plan..."
-                : "Create My Travel Plan"}
-            </button>
-
+              {plan && (
+                <button
+                  type="button"
+                  onClick={handleNewPlan}
+                  className="rounded-xl border border-neutral-300 bg-white px-6 py-4 font-semibold text-neutral-800 transition hover:border-neutral-400"
+                >
+                  Generate New Plan
+                </button>
+              )}
+            </div>
           </form>
-
         </div>
 
-        {/* RESULT */}
-
         {plan && (
-          <div className="mx-auto mt-12 max-w-4xl">
-
-            <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
-
+          <div className="mx-auto mt-12 max-w-5xl rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-8">
+            <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-widest text-neutral-500">
-                  Your VAZHO Plan
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                  Your itinerary
                 </p>
-
-                <h2 className="mt-2 text-3xl font-bold">
+                <h2 className="mt-2 text-3xl font-bold text-neutral-900">
                   {plan.title || `${formData.destination} Travel Plan`}
                 </h2>
               </div>
 
-              {plan.summary && (
-                <p className="mt-4 leading-7 text-neutral-600">
-                  {plan.summary}
-                </p>
-              )}
-
-              {Array.isArray(plan.days) &&
-                plan.days.length > 0 && (
-                  <div className="mt-10 space-y-6">
-
-                    {plan.days.map((day, index) => (
-                      <div
-                        key={index}
-                        className="rounded-2xl border border-neutral-200 p-6"
-                      >
-
-                        <h3 className="text-xl font-bold">
-                          {day.title ||
-                            `Day ${index + 1}`}
-                        </h3>
-
-                        {day.description && (
-                          <p className="mt-2 text-neutral-600">
-                            {day.description}
-                          </p>
-                        )}
-
-                        {Array.isArray(day.activities) &&
-                          day.activities.length > 0 && (
-                            <ul className="mt-4 space-y-3">
-                              {day.activities.map(
-                                (activity, activityIndex) => (
-                                  <li
-                                    key={activityIndex}
-                                    className="flex gap-3 text-neutral-700"
-                                  >
-                                    <span className="mt-1">
-                                      •
-                                    </span>
-
-                                    <span>
-                                      {typeof activity ===
-                                      "string"
-                                        ? activity
-                                        : activity.name ||
-                                          activity.title ||
-                                          JSON.stringify(
-                                            activity
-                                          )}
-                                    </span>
-                                  </li>
-                                )
-                              )}
-                            </ul>
-                          )}
-
-                      </div>
-                    ))}
-
-                  </div>
-                )}
-
-              {Array.isArray(plan.tips) &&
-                plan.tips.length > 0 && (
-                  <div className="mt-10">
-
-                    <h3 className="text-xl font-bold">
-                      Travel Tips
-                    </h3>
-
-                    <ul className="mt-4 list-disc space-y-2 pl-5 text-neutral-600">
-                      {plan.tips.map((tip, index) => (
-                        <li key={index}>
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-
-                  </div>
-                )}
-
+              <button
+                type="button"
+                onClick={handleSavePlan}
+                disabled={saving}
+                className="rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {saving ? "Saving..." : "Save Travel Plan"}
+              </button>
             </div>
 
+            {saveMessage && (
+              <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+                {saveMessage}
+              </div>
+            )}
+
+            {plan.summary && (
+              <div className="mb-8 rounded-2xl bg-neutral-100 p-5">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                  Summary
+                </p>
+                <p className="mt-3 text-base leading-7 text-neutral-700">{plan.summary}</p>
+              </div>
+            )}
+
+            <div className="grid gap-5 lg:grid-cols-2">
+              {Array.isArray(plan.days) && plan.days.length > 0 && (
+                <div className="lg:col-span-2">
+                  <h3 className="mb-4 text-xl font-bold text-neutral-900">Day-by-day itinerary</h3>
+                  <div className="space-y-5">
+                    {plan.days.map((day, index) => (
+                      <div key={index} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+                        <h4 className="text-lg font-bold text-neutral-900">
+                          {day.title || `Day ${index + 1}`}
+                        </h4>
+                        {day.description && (
+                          <p className="mt-2 text-sm leading-6 text-neutral-600">{day.description}</p>
+                        )}
+
+                        {Array.isArray(day.activities) && day.activities.length > 0 && (
+                          <ul className="mt-4 space-y-2">
+                            {day.activities.map((activity, activityIndex) => (
+                              <li key={activityIndex} className="flex items-start gap-3 text-sm text-neutral-700">
+                                <span className="mt-1 text-base text-neutral-500">•</span>
+                                <span>{typeof activity === "string" ? activity : activity.name || activity.title || JSON.stringify(activity)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {Array.isArray(plan.tips) && plan.tips.length > 0 && (
+              <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <h3 className="text-xl font-bold text-neutral-900">Travel tips</h3>
+                <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-neutral-700">
+                  {plan.tips.map((tip, index) => (
+                    <li key={index}>{tip}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
-
       </div>
     </main>
   );

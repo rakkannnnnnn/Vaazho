@@ -1,3 +1,4 @@
+const AIPlan = require("../models/AIPlan");
 const { generateAIResponse } = require("../services/aiService");
 
 const testAI = async (req, res) => {
@@ -165,7 +166,152 @@ Requirements:
   }
 };
 
+const saveAIPlan = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const {
+      title,
+      destination,
+      days,
+      travelers,
+      budget,
+      interests,
+      summary,
+      itinerary,
+      tips,
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Plan title is required.",
+      });
+    }
+
+    if (!destination || !destination.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Destination is required.",
+      });
+    }
+
+    if (!summary || !summary.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Plan summary is required.",
+      });
+    }
+
+    if (!interests || !interests.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Interests are required.",
+      });
+    }
+
+    const parsedDays = Number(days);
+    const parsedTravelers = Number(travelers);
+
+    if (!Number.isInteger(parsedDays) || parsedDays < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Days must be a valid number.",
+      });
+    }
+
+    if (!Number.isInteger(parsedTravelers) || parsedTravelers < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Travelers must be a valid number.",
+      });
+    }
+
+    if (!Array.isArray(itinerary) || itinerary.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one itinerary day is required.",
+      });
+    }
+
+    const normalizedItinerary = itinerary.map((day) => ({
+      title: String(day?.title || "").trim(),
+      description: String(day?.description || "").trim(),
+      activities: Array.isArray(day?.activities)
+        ? day.activities.map((activity) => String(activity).trim()).filter(Boolean)
+        : [],
+    }));
+
+    if (normalizedItinerary.some((day) => !day.title || !day.description)) {
+      return res.status(400).json({
+        success: false,
+        message: "Each itinerary day must include a title and description.",
+      });
+    }
+
+    const plan = await AIPlan.create({
+      user: req.user._id,
+      title: title.trim(),
+      destination: destination.trim(),
+      days: parsedDays,
+      travelers: parsedTravelers,
+      budget: budget || "medium",
+      interests: interests.trim(),
+      summary: summary.trim(),
+      itinerary: normalizedItinerary,
+      tips: Array.isArray(tips)
+        ? tips.map((tip) => String(tip).trim()).filter(Boolean)
+        : [],
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Travel plan saved successfully.",
+      plan,
+    });
+  } catch (error) {
+    console.error("SAVE AI PLAN ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to save travel plan.",
+    });
+  }
+};
+
+const getMyAIPlans = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const plans = await AIPlan.find({ user: req.user._id }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      plans,
+    });
+  } catch (error) {
+    console.error("GET MY AI PLANS ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load travel plans.",
+    });
+  }
+};
+
 module.exports = {
   testAI,
   generateTravelPlan,
+  saveAIPlan,
+  getMyAIPlans,
 };

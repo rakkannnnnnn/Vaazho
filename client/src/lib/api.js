@@ -76,4 +76,12 @@ export const api = {
     fetchJson(`/api/bookings/${bookingId}/cancel`, {
       method: "PATCH",
     }),
+
+  // AI plans API
+  saveAIPlan: (planData) =>
+    fetchJson("/api/ai/plans", {
+      method: "POST",
+      body: JSON.stringify(planData),
+    }),
+  getMyAIPlans: () => fetchJson("/api/ai/plans"),
 };

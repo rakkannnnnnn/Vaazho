@@ -22,6 +22,7 @@ import Account from "@/pages/Account/Account";
 import Properties from "@/pages/Properties/Properties";
 import PropertyDetails from "@/pages/PropertyDetails/PropertyDetails";
 import RoomDetails from "@/pages/RoomDetails/RoomDetails";
+import AITest from "@/components/ai/AITest";
 
 function ProtectedRoute({ children }) {
   const { loading, isAuthenticated } = useAuth();
@@ -62,6 +63,7 @@ function AppRoutes() {
             element={<PropertyDetails />}
           />
           <Route path="/ai-planner" element={<AIPlanner />} />
+          <Route path="/ai-test" element={<AITest />} />
           
           {/* Protected Routes */}
           <Route
@@ -102,6 +104,7 @@ function AppRoutes() {
           <Route path="/sign-up" element={<Navigate to="/register" replace />} />
           <Route path="/sign-in/*" element={<Navigate to="/login" replace />} />
           <Route path="/sign-up/*" element={<Navigate to="/register" replace />} />
+          
         </Route>
       </Routes>
     </BrowserRouter>

@@ -8,6 +8,7 @@ const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const customizationRoutes = require("./routes/customizationRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use("/api/rooms", roomRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/customizations", customizationRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/ai", aiRoutes);
 
 // =====================================================
 // EXPORT APP

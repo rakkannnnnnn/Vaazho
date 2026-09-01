@@ -309,9 +309,95 @@ const getMyAIPlans = async (req, res) => {
   }
 };
 
+const getAIPlanById = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const { id } = req.params;
+
+    const plan = await AIPlan.findById(id);
+
+    if (!plan) {
+      return res.status(404).json({
+        success: false,
+        message: "Travel plan not found.",
+      });
+    }
+
+    if (plan.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to view this travel plan.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      plan,
+    });
+  } catch (error) {
+    console.error("GET AI PLAN BY ID ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load travel plan.",
+    });
+  }
+};
+
+const deleteAIPlan = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
+    }
+
+    const { id } = req.params;
+
+    const plan = await AIPlan.findById(id);
+
+    if (!plan) {
+      return res.status(404).json({
+        success: false,
+        message: "Travel plan not found.",
+      });
+    }
+
+    if (plan.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this travel plan.",
+      });
+    }
+
+    await AIPlan.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Travel plan deleted successfully.",
+    });
+  } catch (error) {
+    console.error("DELETE AI PLAN ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to delete travel plan.",
+    });
+  }
+};
+
 module.exports = {
   testAI,
   generateTravelPlan,
   saveAIPlan,
   getMyAIPlans,
+  getAIPlanById,
+  deleteAIPlan,
 };

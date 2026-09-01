@@ -84,4 +84,9 @@ export const api = {
       body: JSON.stringify(planData),
     }),
   getMyAIPlans: () => fetchJson("/api/ai/plans"),
+  getAIPlanById: (planId) => fetchJson(`/api/ai/plans/${planId}`),
+  deleteAIPlan: (planId) =>
+    fetchJson(`/api/ai/plans/${planId}`, {
+      method: "DELETE",
+    }),
 };

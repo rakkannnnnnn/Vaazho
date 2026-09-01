@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
 
 function MyPlans() {
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,6 +27,10 @@ function MyPlans() {
     fetchPlans();
   }, []);
 
+  const handlePlanClick = (planId) => {
+    navigate(`/my-plans/${planId}`);
+  };
+
   return (
     <main className="min-h-screen bg-neutral-50 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
@@ -45,7 +51,7 @@ function MyPlans() {
 
         {loading ? (
           <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center text-neutral-600">
-            Loading your plans...
+            Loading your travel plans...
           </div>
         ) : plans.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-neutral-300 bg-white p-10 text-center shadow-sm">
@@ -57,7 +63,12 @@ function MyPlans() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {plans.map((plan) => (
-              <div key={plan._id} className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <button
+                key={plan._id}
+                type="button"
+                onClick={() => handlePlanClick(plan._id)}
+                className="rounded-3xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:border-neutral-300 hover:shadow-md"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
@@ -87,7 +98,7 @@ function MyPlans() {
                 <div className="mt-5 border-t border-neutral-200 pt-4 text-xs text-neutral-500">
                   Created: {new Date(plan.createdAt).toLocaleDateString()}
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}

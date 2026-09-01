@@ -1,11 +1,18 @@
 const API_BASE_URL = "http://localhost:5000/api";
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("vazho_token");
+
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
 export const testAI = async (message) => {
   const response = await fetch(`${API_BASE_URL}/ai/test`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ message }),
   });
 
@@ -13,6 +20,67 @@ export const testAI = async (message) => {
 
   if (!response.ok) {
     throw new Error(data.message || "Failed to test AI.");
+  }
+
+  return data;
+};
+
+export const saveAIPlan = async (plan) => {
+  const response = await fetch(`${API_BASE_URL}/ai/plans`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(plan),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to save travel plan.");
+  }
+
+  return data;
+};
+
+export const getMyAIPlans = async () => {
+  const response = await fetch(`${API_BASE_URL}/ai/plans`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load travel plans.");
+  }
+
+  return data;
+};
+
+export const getAIPlanById = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/ai/plans/${id}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Unable to load travel plan.");
+  }
+
+  return data;
+};
+
+export const deleteAIPlan = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/ai/plans/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to delete travel plan.");
   }
 
   return data;
@@ -27,9 +95,7 @@ export const generateTravelPlan = async ({
 }) => {
   const response = await fetch(`${API_BASE_URL}/ai/plan`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       destination,
       days,

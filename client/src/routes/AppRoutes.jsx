@@ -24,6 +24,7 @@ import RoomDetails from "@/pages/RoomDetails/RoomDetails";
 import AITest from "@/components/ai/AITest";
 import AIPlanner from "@/components/ai/AIPlanner";
 import MyPlans from "@/pages/MyPlans/MyPlans";
+import PlanDetails from "@/pages/MyPlans/PlanDetails";
 
 function ProtectedRoute({ children }) {
   const { loading, isAuthenticated } = useAuth();
@@ -65,7 +66,22 @@ function AppRoutes() {
           />
           <Route path="/ai-planner" element={<AIPlanner />} />
           <Route path="/ai-test" element={<AITest />} />
-          <Route path="/my-plans" element={<MyPlans />} />
+          <Route
+            path="/my-plans"
+            element={
+              <ProtectedRoute>
+                <MyPlans />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-plans/:planId"
+            element={
+              <ProtectedRoute>
+                <PlanDetails />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected Routes */}
           <Route

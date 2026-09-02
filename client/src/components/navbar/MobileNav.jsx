@@ -1,4 +1,3 @@
-import React from "react";
 import { LogOut, Menu, User, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -6,6 +5,14 @@ import { navLinks } from "./navLinks";
 
 function MobileNav({ open, onToggle, onNavigate }) {
   const { user, isAuthenticated, logout } = useAuth();
+  const privateLinks = isAuthenticated
+    ? [{ label: "Expenses", path: "/expenses" }]
+    : [];
+  const roleLinks = user?.role === "owner"
+    ? [{ label: "Owner Dashboard", path: "/owner" }]
+    : user?.role === "admin"
+      ? [{ label: "Admin Dashboard", path: "/admin" }]
+      : [];
 
   return (
     <div className="md:hidden">
@@ -22,7 +29,7 @@ function MobileNav({ open, onToggle, onNavigate }) {
       {open && (
         <div className="absolute left-0 right-0 top-full border-t border-neutral-200 bg-white px-6 py-4 shadow-lg dark:border-neutral-800 dark:bg-neutral-950">
           <nav className="flex flex-col gap-1">
-            {navLinks.map((link) => (
+            {[...navLinks, ...privateLinks, ...roleLinks].map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}

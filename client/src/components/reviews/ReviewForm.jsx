@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 
 import { createReview } from "@/services/reviewService";
@@ -13,6 +13,14 @@ function ReviewForm({ bookings = [], onCreated }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (!bookingId && reviewableBookings[0]?._id) {
+      // Bookings arrive asynchronously after the property loads.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setBookingId(reviewableBookings[0]._id);
+    }
+  }, [bookingId, reviewableBookings]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

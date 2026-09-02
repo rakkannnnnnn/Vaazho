@@ -1,10 +1,21 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import { navLinks } from "./navLinks";
 
 function DesktopNav() {
+  const { user, isAuthenticated } = useAuth();
+  const privateLinks = isAuthenticated
+    ? [{ label: "Expenses", path: "/expenses" }]
+    : [];
+  const roleLinks = user?.role === "owner"
+    ? [{ label: "Owner Dashboard", path: "/owner" }]
+    : user?.role === "admin"
+      ? [{ label: "Admin Dashboard", path: "/admin" }]
+      : [];
+
   return (
     <nav className="hidden items-center gap-1 md:flex">
-      {navLinks.map((link) => (
+      {[...navLinks, ...privateLinks, ...roleLinks].map((link) => (
         <NavLink
           key={link.path}
           to={link.path}

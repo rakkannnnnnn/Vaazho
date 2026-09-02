@@ -132,7 +132,7 @@ function DestinationDetail() {
             longitude={destination.longitude}
             zoom={11}
             properties={properties}
-            attractions={[]}
+            attractions={destination.attractions || destination.attractionsData || []}
           />
         </div>
       </section>

@@ -18,7 +18,7 @@ function MyPlans() {
         setPlans(Array.isArray(data.plans) ? data.plans : []);
       } catch (err) {
         console.error("My plans fetch error:", err);
-        setError(err.message || "Failed to load your saved travel plans.");
+        setError("Unable to load your travel plans.");
       } finally {
         setLoading(false);
       }
@@ -63,10 +63,8 @@ function MyPlans() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {plans.map((plan) => (
-              <button
+              <div
                 key={plan._id}
-                type="button"
-                onClick={() => handlePlanClick(plan._id)}
                 className="rounded-3xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:border-neutral-300 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -98,7 +96,15 @@ function MyPlans() {
                 <div className="mt-5 border-t border-neutral-200 pt-4 text-xs text-neutral-500">
                   Created: {new Date(plan.createdAt).toLocaleDateString()}
                 </div>
-              </button>
+
+                <button
+                  type="button"
+                  onClick={() => handlePlanClick(plan._id)}
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+                >
+                  View Plan
+                </button>
+              </div>
             ))}
           </div>
         )}

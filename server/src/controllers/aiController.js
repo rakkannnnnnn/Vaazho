@@ -1,6 +1,109 @@
 const AIPlan = require("../models/AIPlan");
 const { generateAIResponse } = require("../services/aiService");
 
+const normalizeAIPlan = (destinationInput, plan) => {
+  if (!plan || typeof plan !== "object") {
+    throw new Error("AI returned an invalid travel plan format.");
+  }
+
+  const requiredFields = [
+    "title",
+    "summary",
+    "destination",
+    "days",
+    "travelers",
+    "budget",
+    "itinerary",
+    "tips",
+  ];
+
+  for (const field of requiredFields) {
+    if (!(field in plan)) {
+      throw new Error(`AI response is missing the required field: ${field}.`);
+    }
+  }
+
+  const title = String(plan.title || "").trim();
+  const summary = String(plan.summary || "").trim();
+  const destination = String(plan.destination || "").trim();
+  const normalizedDestination = destinationInput?.trim() || "";
+  const days = Number(plan.days);
+  const travelers = Number(plan.travelers);
+  const budget = String(plan.budget || "medium").trim() || "medium";
+
+  if (!title || !summary || !destination) {
+    throw new Error("AI response is missing required plan details.");
+  }
+
+  if (!Number.isInteger(days) || days < 1) {
+    throw new Error("AI response contains an invalid itinerary length.");
+  }
+
+  if (!Number.isInteger(travelers) || travelers < 1) {
+    throw new Error("AI response contains an invalid traveler count.");
+  }
+
+  if (
+    normalizedDestination &&
+    destination.toLowerCase() !== normalizedDestination.toLowerCase() &&
+    !destination.toLowerCase().includes(normalizedDestination.toLowerCase()) &&
+    !normalizedDestination.toLowerCase().includes(destination.toLowerCase())
+  ) {
+    throw new Error("AI response destination does not match the requested destination.");
+  }
+
+  if (!Array.isArray(plan.itinerary)) {
+    throw new Error("AI response itinerary must be an array.");
+  }
+
+  const itinerary = plan.itinerary
+    .map((day, index) => {
+      if (!day || typeof day !== "object") return null;
+
+      const dayNumber = Number(day.day ?? index + 1);
+      const dayTitle = String(day.title || "").trim();
+      const dayDescription = String(day.description || "").trim();
+      const activities = Array.isArray(day.activities)
+        ? day.activities
+            .map((activity) => String(activity).trim())
+            .filter(Boolean)
+        : [];
+
+      if (!dayTitle || !dayDescription) {
+        return null;
+      }
+
+      return {
+        day: Number.isInteger(dayNumber) && dayNumber > 0 ? dayNumber : index + 1,
+        title: dayTitle,
+        description: dayDescription,
+        activities,
+      };
+    })
+    .filter(Boolean);
+
+  if (itinerary.length === 0) {
+    throw new Error("AI response itinerary is empty or invalid.");
+  }
+
+  if (!Array.isArray(plan.tips)) {
+    throw new Error("AI response tips must be an array.");
+  }
+
+  const tips = plan.tips.map((tip) => String(tip).trim()).filter(Boolean);
+
+  return {
+    title,
+    summary,
+    destination,
+    days,
+    travelers,
+    budget,
+    itinerary,
+    tips,
+  };
+};
+
 const testAI = async (req, res) => {
   try {
     const { message } = req.body;
@@ -98,63 +201,62 @@ const generateTravelPlan = async (req, res) => {
     const prompt = `
 You are VAZHO, an AI travel planning assistant.
 
-Return only valid JSON using this exact shape:
+Return only valid JSON with this exact structure:
 
 {
   "title": "3 Day Jaipur Travel Plan",
   "summary": "A personalized travel plan for Jaipur.",
-  "days": [
+  "destination": "Jaipur",
+  "days": 3,
+  "travelers": 2,
+  "budget": "medium",
+  "itinerary": [
     {
-      "title": "Day 1",
-      "description": "Explore Jaipur.",
+      "day": 1,
+      "title": "Historical Jaipur",
+      "description": "Begin with the heritage core of Jaipur.",
       "activities": [
         "Visit Amber Fort",
-        "Explore City Palace"
+        "Explore City Palace",
+        "Walk through the bazaars"
       ]
     }
   ],
   "tips": [
-    "Start sightseeing early.",
-    "Carry water."
+    "Start sightseeing early to avoid the heat.",
+    "Carry cash for local markets and street food."
   ]
 }
 
 Requirements:
-- Destination: ${destination.trim()}
+- Destination must be exactly: ${destination.trim()}
+- The plan must stay focused on ${destination.trim()} and its local attractions, food, culture, and interests.
 - Duration: ${parsedDays} days
 - Travelers: ${parsedTravelers}
 - Budget: ${budget || "medium"}
 - Interests: ${interests.trim()}
-- Make the plan realistic and tailored to the destination and interests.
+- The itinerary must be realistic, day-by-day, and consistent with the destination and interests.
+- Do not invent unrelated destinations or generic random travel plans.
 - Do not include markdown or code blocks.
 - Return JSON only.
 `;
 
     const result = await generateAIResponse(prompt);
+    let normalizedPlan;
 
-    if (
-      !result ||
-      typeof result !== "object" ||
-      typeof result.title !== "string" ||
-      !Array.isArray(result.days) ||
-      !Array.isArray(result.tips)
-    ) {
+    try {
+      normalizedPlan = normalizeAIPlan(destination.trim(), result);
+    } catch (error) {
+      console.error("AI travel plan normalization error:", error);
       return res.status(502).json({
         success: false,
-        message: "AI returned an invalid travel plan format.",
+        message: error.message || "AI returned an invalid travel plan format.",
       });
     }
 
     return res.status(200).json({
       success: true,
-      data: {
-        title: result.title,
-        summary:
-          result.summary ||
-          `A personalized travel plan for ${destination.trim()}.`,
-        days: result.days,
-        tips: result.tips,
-      },
+      data: normalizedPlan,
     });
   } catch (error) {
     console.error("AI travel plan error:", error);

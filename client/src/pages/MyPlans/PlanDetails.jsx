@@ -57,7 +57,7 @@ function PlanDetails() {
       setRegeneratedPlan(null);
     } catch (err) {
       console.error("Plan details load error:", err);
-      setError(err.message || "Unable to load this saved travel plan.");
+      setError(err.message === "Travel plan not found." ? "Travel plan not found." : "Unable to load this saved travel plan.");
     } finally {
       setLoading(false);
     }
@@ -222,8 +222,8 @@ function PlanDetails() {
     return (
       <main className="min-h-screen bg-neutral-50 px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-xl rounded-3xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-bold text-red-700">Travel Plan Not Available</h1>
-          <p className="mt-3 text-sm text-red-600">{error || "This plan could not be found."}</p>
+          <h1 className="text-2xl font-bold text-red-700">Travel plan not found.</h1>
+          <p className="mt-3 text-sm text-red-600">{error || "Travel plan not found."}</p>
           <div className="mt-6 flex justify-center gap-3">
             <Link
               to="/my-plans"
@@ -470,6 +470,36 @@ function PlanDetails() {
             <p className="mt-3 text-base leading-7 text-neutral-700">{plan.summary}</p>
           </div>
 
+          <div className="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+            <h2 className="text-xl font-bold text-neutral-900">Trip details</h2>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Trip title</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.title}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Destination</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.destination}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Days</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.days}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Travelers</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.travelers}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Budget</p>
+                <p className="mt-2 text-base font-semibold capitalize text-neutral-900">{plan.budget}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Interests</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.interests || "Not specified"}</p>
+              </div>
+            </div>
+          </div>
+
           {regeneratedPlan && (
             <div className="mt-8 rounded-2xl border border-violet-200 bg-violet-50 p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -514,12 +544,17 @@ function PlanDetails() {
           )}
 
           <div className="mt-8">
-            <h2 className="text-xl font-bold text-neutral-900">Itinerary</h2>
+            <h2 className="text-xl font-bold text-neutral-900">Full itinerary</h2>
             <div className="mt-5 space-y-4">
               {itinerary.length > 0 ? (
                 itinerary.map((day, index) => (
                   <div key={`${day.title}-${index}`} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                    <h3 className="text-lg font-semibold text-neutral-900">{day.title}</h3>
+                    <h3 className="text-lg font-semibold text-neutral-900">
+                      {day.title || `Day ${Number(day.day) || index + 1}`}
+                    </h3>
+                    <p className="mt-2 text-sm font-medium text-neutral-500">
+                      {day.day ? `Day ${day.day}` : `Day ${index + 1}`}
+                    </p>
                     <p className="mt-2 text-sm leading-6 text-neutral-600">{day.description}</p>
 
                     {Array.isArray(day.activities) && day.activities.length > 0 && (
@@ -544,7 +579,7 @@ function PlanDetails() {
 
           {tips.length > 0 && (
             <div className="mt-8">
-              <h2 className="text-xl font-bold text-neutral-900">Helpful Tips</h2>
+              <h2 className="text-xl font-bold text-neutral-900">Travel Tips</h2>
               <ul className="mt-4 space-y-3">
                 {tips.map((tip, index) => (
                   <li key={`${tip}-${index}`} className="flex items-start gap-3 rounded-2xl border border-neutral-200 bg-white p-4 text-sm text-neutral-700">

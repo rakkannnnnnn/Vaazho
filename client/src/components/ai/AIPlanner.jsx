@@ -72,13 +72,13 @@ function AIPlanner() {
 
       const payload = {
         title: plan.title,
-        destination: formData.destination,
-        days: Number(formData.days),
-        travelers: Number(formData.travelers),
-        budget: formData.budget,
+        destination: plan.destination || formData.destination,
+        days: Number(plan.days ?? formData.days),
+        travelers: Number(plan.travelers ?? formData.travelers),
+        budget: plan.budget || formData.budget,
         interests: formData.interests,
         summary: plan.summary,
-        itinerary: Array.isArray(plan.days) ? plan.days : [],
+        itinerary: Array.isArray(plan.itinerary) ? plan.itinerary : [],
         tips: Array.isArray(plan.tips) ? plan.tips : [],
       };
 
@@ -233,7 +233,7 @@ function AIPlanner() {
                   Your itinerary
                 </p>
                 <h2 className="mt-2 text-3xl font-bold text-neutral-900">
-                  {plan.title || `${formData.destination} Travel Plan`}
+                  {plan.title || `${plan.destination || formData.destination} Travel Plan`}
                 </h2>
               </div>
 
@@ -253,6 +253,25 @@ function AIPlanner() {
               </div>
             )}
 
+            <div className="mb-8 grid gap-4 rounded-2xl bg-neutral-100 p-5 md:grid-cols-2 xl:grid-cols-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Destination</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.destination || formData.destination}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Days</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.days || formData.days}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Travelers</p>
+                <p className="mt-2 text-base font-semibold text-neutral-900">{plan.travelers || formData.travelers}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">Budget</p>
+                <p className="mt-2 text-base font-semibold capitalize text-neutral-900">{plan.budget || formData.budget}</p>
+              </div>
+            </div>
+
             {plan.summary && (
               <div className="mb-8 rounded-2xl bg-neutral-100 p-5">
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500">
@@ -262,43 +281,44 @@ function AIPlanner() {
               </div>
             )}
 
-            <div className="grid gap-5 lg:grid-cols-2">
-              {Array.isArray(plan.days) && plan.days.length > 0 && (
-                <div className="lg:col-span-2">
-                  <h3 className="mb-4 text-xl font-bold text-neutral-900">Day-by-day itinerary</h3>
-                  <div className="space-y-5">
-                    {plan.days.map((day, index) => (
-                      <div key={index} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
-                        <h4 className="text-lg font-bold text-neutral-900">
-                          {day.title || `Day ${index + 1}`}
-                        </h4>
-                        {day.description && (
-                          <p className="mt-2 text-sm leading-6 text-neutral-600">{day.description}</p>
-                        )}
+            {Array.isArray(plan.itinerary) && plan.itinerary.length > 0 && (
+              <div className="mb-8">
+                <h3 className="mb-4 text-xl font-bold text-neutral-900">Day-by-day itinerary</h3>
+                <div className="space-y-5">
+                  {plan.itinerary.map((day, index) => (
+                    <div key={`${day.title || "day"}-${index}`} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+                      <h4 className="text-lg font-bold text-neutral-900">
+                        {day.title || `Day ${Number(day.day) || index + 1}`}
+                      </h4>
+                      <p className="mt-2 text-sm font-medium text-neutral-500">
+                        {day.day ? `Day ${day.day}` : `Day ${index + 1}`}
+                      </p>
+                      {day.description && (
+                        <p className="mt-2 text-sm leading-6 text-neutral-600">{day.description}</p>
+                      )}
 
-                        {Array.isArray(day.activities) && day.activities.length > 0 && (
-                          <ul className="mt-4 space-y-2">
-                            {day.activities.map((activity, activityIndex) => (
-                              <li key={activityIndex} className="flex items-start gap-3 text-sm text-neutral-700">
-                                <span className="mt-1 text-base text-neutral-500">•</span>
-                                <span>{typeof activity === "string" ? activity : activity.name || activity.title || JSON.stringify(activity)}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                      {Array.isArray(day.activities) && day.activities.length > 0 && (
+                        <ul className="mt-4 space-y-2">
+                          {day.activities.map((activity, activityIndex) => (
+                            <li key={`${activity || "activity"}-${activityIndex}`} className="flex items-start gap-3 text-sm text-neutral-700">
+                              <span className="mt-1 text-base text-neutral-500">•</span>
+                              <span>{typeof activity === "string" ? activity : activity.name || activity.title || JSON.stringify(activity)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {Array.isArray(plan.tips) && plan.tips.length > 0 && (
               <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                <h3 className="text-xl font-bold text-neutral-900">Travel tips</h3>
+                <h3 className="text-xl font-bold text-neutral-900">Travel Tips</h3>
                 <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-neutral-700">
                   {plan.tips.map((tip, index) => (
-                    <li key={index}>{tip}</li>
+                    <li key={`${tip}-${index}`}>{tip}</li>
                   ))}
                 </ul>
               </div>

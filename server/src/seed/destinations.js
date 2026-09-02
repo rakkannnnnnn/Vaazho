@@ -16,6 +16,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944",
+    latitude: 10.1632,
+    longitude: 76.6413,
     rating: 4.8,
     featured: true,
   },
@@ -31,6 +33,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2",
+    latitude: 15.2993,
+    longitude: 74.1239,
     rating: 4.7,
     featured: true,
   },
@@ -46,6 +50,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1477587458883-47145ed94245",
+    latitude: 26.9124,
+    longitude: 75.7873,
     rating: 4.6,
     featured: false,
   },
@@ -61,6 +67,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1593693397690-362cb9666fc2",
+    latitude: 10.0889,
+    longitude: 77.0595,
     rating: 4.8,
     featured: true,
   },
@@ -76,6 +84,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1597074866923-dc0589150358",
+    latitude: 12.4244,
+    longitude: 75.7382,
     rating: 4.7,
     featured: false,
   },
@@ -91,6 +101,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1602643163983-ed0babc39797",
+    latitude: 24.5854,
+    longitude: 73.7125,
     rating: 4.8,
     featured: false,
   },
@@ -106,6 +118,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1600112356915-089abb8fc71a",
+    latitude: 12.2958,
+    longitude: 76.6394,
     rating: 4.5,
     featured: false,
   },
@@ -121,6 +135,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1600100397608-f010b5eae2d0",
+    latitude: 15.335,
+    longitude: 76.460,
     rating: 4.6,
     featured: false,
   },
@@ -136,6 +152,8 @@ const destinationSeedData = [
     },
     image:
       "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23",
+    latitude: 11.4065,
+    longitude: 76.6932,
     rating: 4.7,
     featured: false,
   },

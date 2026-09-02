@@ -11,6 +11,8 @@ const propertyTemplates = [
     description: "A coastal retreat with sea-view balconies and easy access to local beaches.",
     location: "Beachfront",
     address: "12 Shoreline Avenue",
+    latitude: 15.2993,
+    longitude: 74.1239,
     images: [
       "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
       "https://images.unsplash.com/photo-1494526585095-c41746248156",
@@ -25,6 +27,8 @@ const propertyTemplates = [
     description: "A quiet mountain property surrounded by greenery and scenic viewpoints.",
     location: "Hill Station",
     address: "44 Misty Ridge Road",
+    latitude: 10.0889,
+    longitude: 77.0595,
     images: [
       "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
@@ -39,6 +43,8 @@ const propertyTemplates = [
     description: "A heritage-inspired stay with warm interiors and cultural charm.",
     location: "Heritage District",
     address: "88 Palace Lane",
+    latitude: 26.9124,
+    longitude: 75.7873,
     images: [
       "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",

@@ -2,11 +2,13 @@ import { ArrowLeft, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import TravelMap from "@/components/maps/TravelMap";
 import { api } from "@/lib/api";
 
 function DestinationDetail() {
   const { slug } = useParams();
   const [destination, setDestination] = useState(null);
+  const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -16,11 +18,18 @@ function DestinationDetail() {
         setLoading(true);
         setError("");
 
-        const response = await api.getDestinationBySlug(slug);
-        setDestination(response.data || null);
+        const [destinationResponse, propertiesResponse] = await Promise.all([
+          api.getDestinationBySlug(slug),
+          api.getPropertiesByDestination(slug),
+        ]);
+
+        setDestination(destinationResponse.data || null);
+        setProperties(Array.isArray(propertiesResponse.data) ? propertiesResponse.data : []);
       } catch (err) {
+        console.error("Destination detail load error:", err);
         setError("Destination not found or unable to load this destination.");
         setDestination(null);
+        setProperties([]);
       } finally {
         setLoading(false);
       }
@@ -115,12 +124,16 @@ function DestinationDetail() {
           <h2 className="mt-2 text-3xl font-bold">
             Explore {destination.name}
           </h2>
+        </div>
 
-          <p className="mt-4 leading-7 text-neutral-600">
-            Destination stays, rooms, activities and other travel
-            experiences will appear here as the VAZHO platform is
-            connected to its backend.
-          </p>
+        <div className="mt-10">
+          <TravelMap
+            latitude={destination.latitude}
+            longitude={destination.longitude}
+            zoom={11}
+            properties={properties}
+            attractions={[]}
+          />
         </div>
       </section>
     </main>

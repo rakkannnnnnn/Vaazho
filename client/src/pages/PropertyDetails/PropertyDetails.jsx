@@ -3,12 +3,20 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import RoomGrid from "@/components/rooms/RoomGrid";
+import ReviewForm from "@/components/reviews/ReviewForm";
+import ReviewList from "@/components/reviews/ReviewList";
+import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
 
 function PropertyDetails() {
   const { slug } = useParams();
+  const { isAuthenticated } = useAuth();
   const [property, setProperty] = useState(null);
   const [rooms, setRooms] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [myBookings, setMyBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -22,8 +30,23 @@ function PropertyDetails() {
         setProperty(response.data || null);
 
         const roomsResponse = await api.getRoomsByProperty(slug);
+        const reviewsResponse = await api.getPropertyReviews(response.data?._id);
         setRooms(roomsResponse.data || []);
-      } catch (err) {
+        setReviews(reviewsResponse.reviews || []);
+        setAverageRating(Number(reviewsResponse.averageRating || 0));
+        setReviewCount(Number(reviewsResponse.reviewCount || 0));
+
+        if (isAuthenticated) {
+          const bookingsResponse = await api.getMyBookings();
+          setMyBookings(
+            (bookingsResponse.bookings || []).filter(
+              (booking) => booking.property?._id === response.data?._id
+            )
+          );
+        } else {
+          setMyBookings([]);
+        }
+      } catch {
         setError("Property not found or unavailable.");
         setProperty(null);
         setRooms([]);
@@ -35,7 +58,7 @@ function PropertyDetails() {
     if (slug) {
       loadProperty();
     }
-  }, [slug]);
+  }, [isAuthenticated, slug]);
 
   if (loading) {
     return (
@@ -96,7 +119,8 @@ function PropertyDetails() {
 
               <div className="mt-4 flex items-center gap-2 text-white/90">
                 <Star className="h-4 w-4 fill-current text-yellow-400" />
-                {Number(property.rating || 0).toFixed(1)}
+                {averageRating.toFixed(2)}
+                <span className="text-sm text-white/75">Based on {reviewCount} reviews</span>
               </div>
             </div>
           </div>
@@ -162,7 +186,7 @@ function PropertyDetails() {
                 <span className="font-semibold">Destination:</span> {destinationName}
               </p>
               <p>
-                <span className="font-semibold">Rating:</span> {Number(property.rating || 0).toFixed(1)} / 5
+                <span className="font-semibold">Rating:</span> {averageRating.toFixed(2)} / 5 ({reviewCount} reviews)
               </p>
             </div>
 
@@ -189,6 +213,24 @@ function PropertyDetails() {
           </div>
 
           <RoomGrid rooms={rooms} />
+        </div>
+      </section>
+
+      <section className="border-t border-neutral-200 py-16 dark:border-neutral-800">
+        <div className="mx-auto max-w-7xl space-y-10 px-6 lg:px-8">
+          <ReviewList reviews={reviews} averageRating={averageRating} reviewCount={reviewCount} />
+          {isAuthenticated && (
+            <ReviewForm
+              bookings={myBookings}
+              onCreated={(review) => {
+                setReviews((current) => [review, ...current]);
+                setReviewCount((count) => count + 1);
+                setAverageRating((current) =>
+                  Number(((current * reviewCount + review.rating) / (reviewCount + 1)).toFixed(2))
+                );
+              }}
+            />
+          )}
         </div>
       </section>
     </main>

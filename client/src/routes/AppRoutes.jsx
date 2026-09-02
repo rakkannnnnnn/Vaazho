@@ -28,6 +28,7 @@ import MyPlans from "@/pages/MyPlans/MyPlans";
 import PlanDetails from "@/pages/MyPlans/PlanDetails";
 import Expenses from "@/pages/Expenses/Expenses";
 import OwnerDashboard from "@/pages/Owner/OwnerDashboard";
+import AdminDashboard from "@/pages/Admin/AdminDashboard";
 
 function ProtectedRoute({ children }) {
   const { loading, isAuthenticated } = useAuth();
@@ -65,6 +66,29 @@ function OwnerRoute({ children }) {
   }
 
   if (user?.role !== "owner") {
+    return <Navigate to="/" replace state={{ from: location.pathname }} />;
+  }
+
+  return children;
+}
+
+function AdminRoute({ children }) {
+  const { loading, isAuthenticated, user } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent dark:border-white dark:border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  if (user?.role !== "admin") {
     return <Navigate to="/" replace state={{ from: location.pathname }} />;
   }
 
@@ -140,6 +164,14 @@ function AppRoutes() {
               <OwnerRoute>
                 <OwnerDashboard />
               </OwnerRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
             }
           />
           <Route

@@ -11,6 +11,8 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const ownerRoutes = require("./routes/ownerRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -46,6 +48,8 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/owner", ownerRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // =====================================================
 // EXPORT APP

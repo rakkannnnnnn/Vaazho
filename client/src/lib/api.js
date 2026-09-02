@@ -77,6 +77,29 @@ export const api = {
       method: "PATCH",
     }),
 
+  // Reviews API
+  createReview: (reviewData) =>
+    fetchJson("/api/reviews", {
+      method: "POST",
+      body: JSON.stringify(reviewData),
+    }),
+  getPropertyReviews: (propertyId) =>
+    fetchJson(`/api/reviews/property/${propertyId}`),
+  updateReview: (reviewId, reviewData) =>
+    fetchJson(`/api/reviews/${reviewId}`, {
+      method: "PUT",
+      body: JSON.stringify(reviewData),
+    }),
+  deleteReview: (reviewId) =>
+    fetchJson(`/api/reviews/${reviewId}`, {
+      method: "DELETE",
+    }),
+  respondToReview: (reviewId, responseData) =>
+    fetchJson(`/api/reviews/${reviewId}/response`, {
+      method: "PATCH",
+      body: JSON.stringify(responseData),
+    }),
+
   // AI plans API
   saveAIPlan: (planData) =>
     fetchJson("/api/ai/plans", {

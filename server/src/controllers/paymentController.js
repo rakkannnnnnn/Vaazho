@@ -10,10 +10,25 @@ const {
   sendPaymentConfirmationEmail,
 } = require("../services/emailService");
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+let razorpayClient = null;
+
+const getRazorpayClient = () => {
+  if (razorpayClient) return razorpayClient;
+
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!keyId || !keySecret) {
+    return null;
+  }
+
+  razorpayClient = new Razorpay({
+    key_id: keyId,
+    key_secret: keySecret,
+  });
+
+  return razorpayClient;
+};
 
 // =====================================================
 // CREATE RAZORPAY ORDER
@@ -22,6 +37,15 @@ const razorpay = new Razorpay({
 const createPaymentOrder = async (req, res) => {
   try {
     const { bookingId } = req.body;
+
+    const razorpay = getRazorpayClient();
+
+    if (!razorpay) {
+      return res.status(503).json({
+        success: false,
+        message: "Razorpay is not configured for this environment.",
+      });
+    }
 
     if (!bookingId) {
       return res.status(400).json({
@@ -138,6 +162,13 @@ const verifyPayment = async (req, res) => {
         message: "Payment verification details are required.",
       });
     }
+
+      if (!process.env.RAZORPAY_KEY_SECRET) {
+        return res.status(503).json({
+          success: false,
+          message: "Razorpay is not configured for this environment.",
+        });
+      }
 
     const userId = req.user?._id || req.user?.id;
 

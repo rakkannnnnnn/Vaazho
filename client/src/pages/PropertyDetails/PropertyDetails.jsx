@@ -100,7 +100,8 @@ function PropertyDetails() {
         <img
           src={property.images?.[0] || property.image}
           alt={property.name}
-          className="h-full w-full object-cover"
+            loading="eager"
+            className="h-full w-full object-cover"
         />
 
         <div className="absolute inset-0 bg-black/45" />

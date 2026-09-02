@@ -7,6 +7,7 @@ function Hero() {
       <img
         src="https://images.unsplash.com/photo-1500534623283-312aade485b7"
         alt="Beautiful travel destination"
+        fetchPriority="high"
         className="absolute inset-0 -z-20 h-full w-full scale-105 object-cover"
         />
 

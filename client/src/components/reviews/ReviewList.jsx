@@ -25,7 +25,7 @@ function ReviewList({ reviews = [], averageRating = 0, reviewCount = 0 }) {
                 <div className="flex items-center gap-1 text-sm font-semibold"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /> {review.rating}/5</div>
               </div>
               <p className="mt-2 text-xs text-neutral-500">{new Date(review.createdAt).toLocaleDateString()}</p>
-              <p className="mt-4 leading-7 text-neutral-700 dark:text-neutral-300">{review.comment}</p>
+              <p className="mt-4 break-words leading-7 text-neutral-700 dark:text-neutral-300">{review.comment}</p>
               {review.ownerResponse && (
                 <div className="mt-4 border-l-2 border-neutral-300 pl-4 text-sm dark:border-neutral-700">
                   <p className="font-semibold text-neutral-900 dark:text-white">Owner response</p>

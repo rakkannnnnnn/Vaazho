@@ -83,7 +83,8 @@ function DestinationDetail() {
         <img
           src={destination.image}
           alt={destination.name}
-          className="h-full w-full object-cover"
+            loading="eager"
+            className="h-full w-full object-cover"
         />
 
         <div className="absolute inset-0 bg-black/45" />

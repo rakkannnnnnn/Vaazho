@@ -24,7 +24,7 @@ const generateToken = (user) => {
 // =====================================================
 const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     // 1. Validation
     if (!name || typeof name !== "string" || !name.trim()) {
@@ -58,16 +58,6 @@ const register = async (req, res) => {
       });
     }
 
-    const allowedRoles = ["customer", "owner", "admin"];
-    const normalizedRole = typeof role === "string" ? role.trim().toLowerCase() : "customer";
-
-    if (!allowedRoles.includes(normalizedRole)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid user role.",
-      });
-    }
-
     // 2. Check if user already exists
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
@@ -86,7 +76,7 @@ const register = async (req, res) => {
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
-      role: normalizedRole,
+      role: "customer",
     });
 
     // 5. Generate token

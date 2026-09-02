@@ -75,6 +75,8 @@ function OwnerDashboard() {
   };
 
   useEffect(() => {
+    // Owner data is loaded once when the protected page mounts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDashboard();
   }, []);
 
@@ -209,6 +211,8 @@ function OwnerDashboard() {
         {error && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
         )}
+
+        {loading && <p className="text-sm text-neutral-500">Loading owner data...</p>}
 
         {success && (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">{success}</div>

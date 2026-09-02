@@ -20,7 +20,8 @@ function PropertyCard({ property }) {
         <img
           src={property.images?.[0] || property.image}
           alt={property.name}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            loading="lazy"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />

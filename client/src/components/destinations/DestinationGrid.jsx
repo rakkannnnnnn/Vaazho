@@ -29,6 +29,7 @@ function DestinationGrid({ destinations = [] }) {
               <img
                 src={destination.image}
                 alt={destination.name}
+                loading="lazy"
                 className="h-56 w-full object-cover transition duration-300 group-hover:scale-105"
               />
             )}

@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Star } from "lucide-react";
 
 import { createReview } from "@/services/reviewService";
 
 function ReviewForm({ bookings = [], onCreated }) {
-  const reviewableBookings = bookings.filter(
-    (booking) => booking.status !== "cancelled" && booking.property?._id
+  const reviewableBookings = useMemo(
+    () => bookings.filter(
+      (booking) => booking.status !== "cancelled" && booking.property?._id
+    ),
+    [bookings]
   );
   const [bookingId, setBookingId] = useState(reviewableBookings[0]?._id || "");
   const [rating, setRating] = useState(5);

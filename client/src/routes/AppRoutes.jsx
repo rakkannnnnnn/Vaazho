@@ -27,6 +27,7 @@ import AIPlanner from "@/components/ai/AIPlanner";
 import MyPlans from "@/pages/MyPlans/MyPlans";
 import PlanDetails from "@/pages/MyPlans/PlanDetails";
 import Expenses from "@/pages/Expenses/Expenses";
+import OwnerDashboard from "@/pages/Owner/OwnerDashboard";
 
 function ProtectedRoute({ children }) {
   const { loading, isAuthenticated } = useAuth();
@@ -42,6 +43,29 @@ function ProtectedRoute({ children }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  return children;
+}
+
+function OwnerRoute({ children }) {
+  const { loading, isAuthenticated, user } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent dark:border-white dark:border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  if (user?.role !== "owner") {
+    return <Navigate to="/" replace state={{ from: location.pathname }} />;
   }
 
   return children;
@@ -108,6 +132,14 @@ function AppRoutes() {
               <ProtectedRoute>
                 <Expenses />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner"
+            element={
+              <OwnerRoute>
+                <OwnerDashboard />
+              </OwnerRoute>
             }
           />
           <Route

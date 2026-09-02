@@ -8,6 +8,7 @@ import Home from "@/pages/Home/Home";
 import Rooms from "@/pages/Rooms/Rooms";
 import Destinations from "@/pages/Destinations/Destinations";
 import MyBookings from "@/pages/MyBookings/MyBookings";
+import Bookings from "@/pages/Bookings/Bookings";
 import BookingDetails from "@/pages/BookingDetails/BookingDetails";
 import DestinationDetail from "@/pages/Destinations/DestinationDetail";
 import SearchResults from "@/pages/Search/SearchResults";
@@ -25,6 +26,7 @@ import AITest from "@/components/ai/AITest";
 import AIPlanner from "@/components/ai/AIPlanner";
 import MyPlans from "@/pages/MyPlans/MyPlans";
 import PlanDetails from "@/pages/MyPlans/PlanDetails";
+import Expenses from "@/pages/Expenses/Expenses";
 
 function ProtectedRoute({ children }) {
   const { loading, isAuthenticated } = useAuth();
@@ -88,7 +90,7 @@ function AppRoutes() {
             path="/bookings"
             element={
               <ProtectedRoute>
-                <MyBookings />
+                <Bookings />
               </ProtectedRoute>
             }
           />
@@ -97,6 +99,14 @@ function AppRoutes() {
             element={
               <ProtectedRoute>
                 <BookingDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses"
+            element={
+              <ProtectedRoute>
+                <Expenses />
               </ProtectedRoute>
             }
           />

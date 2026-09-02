@@ -2,7 +2,7 @@ import { ArrowLeft, BedDouble, MapPin, Maximize2, Shield, Users } from "lucide-r
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import BookingCard from "@/components/booking/BookingCard";
+import BookingForm from "@/components/bookings/BookingForm";
 import { api } from "@/lib/api";
 
 function RoomDetails() {
@@ -175,9 +175,9 @@ function RoomDetails() {
             </div>
           </div>
 
-          {/* Right Column: Interactive Booking Card with Customizations */}
+          {/* Right Column: Booking form */}
           <aside className="sticky top-24">
-            <BookingCard room={room} />
+            <BookingForm room={room} />
           </aside>
         </div>
       </section>

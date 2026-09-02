@@ -1,4 +1,13 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const buildApiUrl = (path) => {
+  const base = API_BASE_URL.replace(/\/$/, "").replace(/\/api$/, "");
+  const normalizedPath = path.startsWith("/api")
+    ? path
+    : `/api${path.startsWith("/") ? path : `/${path}`}`;
+
+  return `${base}${normalizedPath}`;
+};
 
 async function fetchJson(url, options = {}) {
   const headers = {
@@ -14,7 +23,7 @@ async function fetchJson(url, options = {}) {
     }
   }
 
-  const response = await fetch(`${API_BASE_URL}${url}`, {
+  const response = await fetch(buildApiUrl(url), {
     ...options,
     headers,
   });

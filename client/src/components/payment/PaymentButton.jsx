@@ -1,6 +1,15 @@
 import { useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const buildApiUrl = (path) => {
+  const base = API_URL.replace(/\/$/, "").replace(/\/api$/, "");
+  const normalizedPath = path.startsWith("/api")
+    ? path
+    : `/api${path.startsWith("/") ? path : `/${path}`}`;
+
+  return `${base}${normalizedPath}`;
+};
 
 function PaymentButton({ bookingId, amount, user, onSuccess }) {
   const [loading, setLoading] = useState(false);
@@ -22,19 +31,16 @@ function PaymentButton({ bookingId, amount, user, onSuccess }) {
       // CREATE RAZORPAY ORDER
       // =================================================
 
-      const response = await fetch(
-        `${API_URL}/api/payments/create-order`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            bookingId,
-          }),
-        }
-      );
+      const response = await fetch(buildApiUrl("/payments/create-order"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          bookingId,
+        }),
+      });
 
       const data = await response.json();
 
@@ -80,28 +86,25 @@ function PaymentButton({ bookingId, amount, user, onSuccess }) {
             // VERIFY PAYMENT ON SERVER
             // =================================================
 
-            const verifyResponse = await fetch(
-              `${API_URL}/api/payments/verify`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  bookingId,
+            const verifyResponse = await fetch(buildApiUrl("/payments/verify"), {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                bookingId,
 
-                  razorpay_payment_id:
-                    paymentResponse.razorpay_payment_id,
+                razorpay_payment_id:
+                  paymentResponse.razorpay_payment_id,
 
-                  razorpay_order_id:
-                    paymentResponse.razorpay_order_id,
+                razorpay_order_id:
+                  paymentResponse.razorpay_order_id,
 
-                  razorpay_signature:
-                    paymentResponse.razorpay_signature,
-                }),
-              }
-            );
+                razorpay_signature:
+                  paymentResponse.razorpay_signature,
+              }),
+            });
 
             const verifyData = await verifyResponse.json();
 

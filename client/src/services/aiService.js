@@ -1,4 +1,13 @@
-const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const buildApiUrl = (path) => {
+  const base = API_BASE_URL.replace(/\/$/, "").replace(/\/api$/, "");
+  const normalizedPath = path.startsWith("/api")
+    ? path
+    : `/api${path.startsWith("/") ? path : `/${path}`}`;
+
+  return `${base}${normalizedPath}`;
+};
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("vazho_token");
@@ -10,7 +19,7 @@ const getAuthHeaders = () => {
 };
 
 export const testAI = async (message) => {
-  const response = await fetch(`${API_BASE_URL}/ai/test`, {
+  const response = await fetch(buildApiUrl("/ai/test"), {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({ message }),
@@ -26,7 +35,7 @@ export const testAI = async (message) => {
 };
 
 export const saveAIPlan = async (plan) => {
-  const response = await fetch(`${API_BASE_URL}/ai/plans`, {
+  const response = await fetch(buildApiUrl("/ai/plans"), {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(plan),
@@ -42,7 +51,7 @@ export const saveAIPlan = async (plan) => {
 };
 
 export const getMyAIPlans = async () => {
-  const response = await fetch(`${API_BASE_URL}/ai/plans`, {
+  const response = await fetch(buildApiUrl("/ai/plans"), {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -57,7 +66,7 @@ export const getMyAIPlans = async () => {
 };
 
 export const getAIPlanById = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/ai/plans/${id}`, {
+  const response = await fetch(buildApiUrl(`/ai/plans/${id}`), {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -72,7 +81,7 @@ export const getAIPlanById = async (id) => {
 };
 
 export const deleteAIPlan = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/ai/plans/${id}`, {
+  const response = await fetch(buildApiUrl(`/ai/plans/${id}`), {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
@@ -87,7 +96,7 @@ export const deleteAIPlan = async (id) => {
 };
 
 export const updateAIPlan = async (id, data) => {
-  const response = await fetch(`${API_BASE_URL}/ai/plans/${id}`, {
+  const response = await fetch(buildApiUrl(`/ai/plans/${id}`), {
     method: "PATCH",
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -109,7 +118,7 @@ export const generateTravelPlan = async ({
   budget,
   interests,
 }) => {
-  const response = await fetch(`${API_BASE_URL}/ai/plan`, {
+  const response = await fetch(buildApiUrl("/ai/plan"), {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({

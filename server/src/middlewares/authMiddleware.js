@@ -7,6 +7,10 @@ const User = require("../models/User");
  */
 const requireAuth = async (req, res, next) => {
   try {
+    if (req.method === "OPTIONS") {
+      return next();
+    }
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

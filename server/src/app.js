@@ -28,20 +28,46 @@ const app = express();
 // MIDDLEWARE
 // =====================================================
 
-const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "http://localhost:5173,http://localhost:5174")
+const defaultOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://vaazho.vercel.app",
+];
+
+const allowedOrigins = (
+  process.env.FRONTEND_URLS ||
+  process.env.FRONTEND_URL ||
+  defaultOrigins.join(",")
+)
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(helmet());
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
+
     return callback(new Error("Origin is not allowed by CORS."));
   },
-}));
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Accept",
+    "Origin",
+    "X-Requested-With",
+  ],
+  exposedHeaders: ["Content-Range", "X-Content-Range"],
+  optionsSuccessStatus: 204,
+};
+
+app.use(helmet());
+app.use(cors(corsOptions));
+app.options(/^(.*)$/, cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 app.use(standardLimiter);
 
